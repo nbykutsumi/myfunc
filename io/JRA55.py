@@ -23,7 +23,7 @@ class Jra55(object):
     hostname = socket.gethostname()
     if hostname == "well":  
       self.baseDir  = "/media/disk2/data/JRA55"
-
+    #----------------
     self.Lat = read_txtlist( os.path.join(self.baseDir, "%s.%s"%(res,"anl_p125"), "lat.txt"))
     self.Lon = read_txtlist( os.path.join(self.baseDir, "%s.%s"%(res,"anl_p125"), "lon.txt"))
     self.ny  = len(self.Lat)
