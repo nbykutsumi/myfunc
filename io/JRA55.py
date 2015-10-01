@@ -23,6 +23,8 @@ class Jra55(object):
     hostname = socket.gethostname()
     if hostname == "well":  
       self.baseDir  = "/media/disk2/data/JRA55"
+    if hostname in ["mizu","naam"]:  
+      self.baseDir  = "/tank/utsumi/data/JRA55"
     #----------------
     self.Lat = read_txtlist( os.path.join(self.baseDir, "%s.%s"%(res,"anl_p125"), "lat.txt"))
     self.Lon = read_txtlist( os.path.join(self.baseDir, "%s.%s"%(res,"anl_p125"), "lon.txt"))
@@ -30,7 +32,7 @@ class Jra55(object):
     self.nx  = len(self.Lon)
     self.res = res
 
-  def load_6hr(self, var, DTime, lev=False):
+  def path_6hr(self, var, DTime, lev=False):
     tstep = "6hr"
     Year  = DTime.year
     Mon   = DTime.month
@@ -46,15 +48,24 @@ class Jra55(object):
       self.srcPath = os.path.join(self.srcDir,  "anl_surf125.%s.%04d%02d%02d%02d.%s"%(var, Year, Mon, Day, Hour, self.res))
       self.prdType = "anl_surf125"
 
+    return self
+
+
+  def load_6hr(self, var, DTime, lev=False):
+    self      = self.path_6hr(var, DTime, lev)
     self.Data = fromfile(self.srcPath, float32).reshape(self.ny, self.nx)
     return self
 
 
-  def load_mon(self, var, Year, Mon, lev=False):
+  def path_mon(self, var, Year, Mon, lev=False):
     if var in ["BRTMP"]:
       self.srcDir  = os.path.join(self.baseDir, "%s.fcst_surf125"%(self.res), "Monthly", var, "%04d"%(Year))
       self.srcPath = os.path.join(self.srcDir,  "fcst_surf125.%s.%04d%02d.%s"%(var, Year, Mon, self.res))
 
+    return self
+
+  def load_mon(self, var, Year, Mon, lev=False):
+    self      = self.path_mon(var, Year, Mon, lev)
     self.Data = fromfile(self.srcPath, float32).reshape(self.ny, self.nx)
     return self
 
@@ -70,13 +81,17 @@ class Jra55(object):
 #      return ma.masked_equal(array([load_bn(var,DTime,lev).Data for DTime in lDTime]).mean(axis=0), miss).mean(axis=0)
     
 
+  def path_const(self, var):
+    if var in ["topo","land"]:
+      self.srcDir = "%s/%s.LL125/const"%(self.baseDir, self.res)
+      self.srcPath= os.path.join(self.srcDir, "%s.%s"%(var, self.res))
+    return self
+
+
   def load_const(self, var, miss=False):
     """
     var="topo", "land"
     """
-    if var in ["topo","land"]:
-      self.srcDir = "%s/%s.LL125/const"%(self.baseDir, self.res)
-      self.srcPath= os.path.join(self.srcDir, "%s.%s"%(var, self.res))
-
+    self        = self.path_const(var)
     self.Data   = fromfile(self.srcPath, float32).reshape(self.ny, self.nx)
     return self 

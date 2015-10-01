@@ -1,19 +1,15 @@
-import socket
 from numpy import *
 from datetime import datetime
 import os, sys
 #**********************************************
 class Jra25saone():
   def __init__(self):
-    #---------------
-    hostname = socket.gethostname()
-    if hostname == "well":
-      self.baseDir  = "/media/disk2/data/JRA25"
-    #---------------
+    self.baseDir  = "/media/disk2/data/JRA25"
     self.Lat      = array(arange(-89.5, 89.5+0.01, 1.0), float32)
     self.Lon      = array(arange(0.5, 359.5+0.01, 1.0), float32)
     self.ny       = 180
     self.nx       = 360
+
 
   def load_6hr(self, var, DTime, lev=False):
     Year = DTime.year
@@ -41,7 +37,7 @@ class Jra25saone():
     topo
     """
     if var == "topo":
-      self.srcDir  = "%s/sa.one.125/const/%s"%(self.baseDir, var)
+      self.srcDir  = "/media/disk2/data/JRA25/sa.one.125/const/%s"%(var)
       self.srcPath = os.path.join(self.srcDir, "%s.sa.one"%(var))
 
     self.Data    = fromfile(self.srcPath, float32).reshape(self.ny, self.nx)
@@ -49,12 +45,7 @@ class Jra25saone():
 
 class Jra25():
   def __init__(self, res="bn"):
-    #--------
-    hostname = socket.gethostname()
-    if hostname == "well":
-      self.baseDir  = "/media/disk2/data/JRA25"
-    #--------
-
+    self.baseDir  = "/media/disk2/data/JRA25"
     self.Lat      = array(arange(-90, 90+0.001, 1.25),  float32)
     self.Lon      = array(arange(0, 358.75+0.001, 1.25),float32)
     self.ny       = 145
@@ -89,7 +80,7 @@ class Jra25():
     """
     res  = self.res
     if var == "topo":
-      self.srcDir  = "%s/%s.125/const/%s"%(self.baseDir, res, var)
+      self.srcDir  = "/media/disk2/data/JRA25/%s.125/const/%s"%(res, var)
       self.srcPath = os.path.join(self.srcDir, "%s.%s"%(var, res))
 
     self.Data    = fromfile(self.srcPath, float32).reshape(self.ny, self.nx)
