@@ -2,7 +2,7 @@ import socket
 import os
 from numpy import *
 from datetime import datetime
-
+#-- test @ 27th Oct ---
 #****************************************************
 def read_txtlist(iname):
   f = open(iname, "r")
@@ -94,4 +94,6 @@ class Jra55(object):
     """
     self        = self.path_const(var)
     self.Data   = fromfile(self.srcPath, float32).reshape(self.ny, self.nx)
-    return self 
+    return self
+
+ 
