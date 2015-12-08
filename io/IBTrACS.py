@@ -1,16 +1,23 @@
 from numpy import *
-import datetime
+from datetime import datetime
 import os
 import calendar
+import socket
 #**********************************************
 def nearest_idx(aSrc,val):
     ''' return nearest index. by HJKIM'''
     if hasattr(val,'__iter__'): return [abs(aSrc-v).argmin() for v in val]
     else: return abs(aSrc-val).argmin()
 #**********************************************
-class ibtracs(object):
+class IBTrACS(object):
   def __init__(self):
-    self.baseDir = "/media/disk2/data/ibtracs"
+    #-- check host --
+    hostname = socket.gethostname()
+    if hostname == "well":
+      self.baseDir  = "/media/disk2/data/ibtracs"
+    if hostname in ["mizu","naam"]:
+      self.baseDir  = "/tank/utsumi/data/ibtracs"
+    #----------------
     self.Versions= ["v03r04","v03r06"]
 
 
@@ -20,11 +27,19 @@ class ibtracs(object):
     return self
 
   def ret_dlonlat(self,Year, ver="v03r06"):
-    srcPath = self.ret_path(Year, ver).srcPath
     lHour   = [0,6,12,18]
-    #-- open ----
-    f = open(srcPath, "r")
-    lines = f.readlines()
+    lines   = []
+    #-- open Y=Year-1 ----
+    srcPath = self.ret_path(Year-1, ver).srcPath
+    if os.path.exists(srcPath):
+      f       = open(srcPath, "r")
+      lines   = lines + f.readlines()[3:]
+      f.close()
+
+    #-- open Y=Year----
+    srcPath = self.ret_path(Year, ver).srcPath
+    f       = open(srcPath, "r")
+    lines   = lines + f.readlines()[3:]
     f.close()
     #--- init dict ---
     dout   = {}
@@ -32,9 +47,9 @@ class ibtracs(object):
       eDay = calendar.monthrange(Year,Mon)[1]
       for Day in range(1,eDay+1):
         for Hour in lHour:
-          dout[Year,Mon,Day,Hour] = []
+          dout[datetime(Year,Mon,Day,Hour)] = []
     #-----------------
-    for line in lines[3:]:
+    for line in lines:
       line     = line.split(",")
       isotime  = line[6].split(" ")
       date     = map(int, isotime[0].split("-"))
@@ -52,6 +67,7 @@ class ibtracs(object):
       nature   = line[7].strip()
       if nature not in ["TS"]:
         continue
+
       #-----------------
       tcname   = line[5].strip()
       tcid     = line[0]
@@ -60,8 +76,11 @@ class ibtracs(object):
       if (lon < 0.0):
         lon = 360.0 + lon
       #-----------------
-      dout[Year,Mon,Day,Hour].append((lon,lat))
+
+      DTime    = datetime(Year,Mon,Day,Hour)
+#      dout[Year,Mon,Day,Hour].append((lon,lat))
 #      dout[Year,Mon,Day,Hour].append([lon,lat])
+      dout[DTime].append([lon,lat])
     #---
     return dout
   #################################################
@@ -80,4 +99,26 @@ class ibtracs(object):
     #---
     return dout
 
- 
+
+class IBTrACS_2D(IBTrACS):
+  def __init__(self, Year, a1lon, a1lat, miss=-9999.0, ver="v03r06"):
+    IBTrACS.__init__(self)
+    self.dpyxy   = self.ret_dpyxy(Year, a1lon, a1lat, ver="v03r06")
+    self.Lat     = a1lat
+    self.Lon     = a1lon
+    self.ny      = len(a1lat)
+    self.nx      = len(a1lon)
+    self.a2miss  = ones([self.ny, self.nx], float32)*(miss)
+
+  def load_a2dat(self, DTime):
+    #lpyxy        = self.dpyxy[DTime.year, DTime.month, DTime.day, DTime.hour]
+    lpyxy        = self.dpyxy[DTime]
+    a2dat        = self.a2miss.copy()
+
+    a2dat[ zip(*lpyxy)[::-1]] = 1.0
+    return a2dat
+
+    
+
+
+
