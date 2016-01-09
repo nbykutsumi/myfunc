@@ -1,6 +1,6 @@
 from numpy import *
 from datetime import datetime
-import os
+import os, sys
 import calendar
 import socket
 #**********************************************
@@ -58,7 +58,7 @@ class IBTrACS(object):
       Day      = date[2]
       Hour     = int(isotime[1].split(":")[0])
       #--- check Year --
-      if Year != Year:
+      if Year_tmp != Year:
         continue
       #--- check Hour --
       if Hour not in lHour:
@@ -76,7 +76,6 @@ class IBTrACS(object):
       if (lon < 0.0):
         lon = 360.0 + lon
       #-----------------
-
       DTime    = datetime(Year,Mon,Day,Hour)
 #      dout[Year,Mon,Day,Hour].append((lon,lat))
 #      dout[Year,Mon,Day,Hour].append([lon,lat])

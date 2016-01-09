@@ -60,20 +60,32 @@ class GSMaP(object):
     self.Data   = flipud(fromfile(self.srcPath, float32).reshape(self.ny, self.nx))   # mm/hour
     return self
 
-  def time_ave_mmh(self, iDTime, eDTime, dDTime):
-    lDTime = ret_lDTime(iDTime, eDTime, dDTime)
-    return (ma.masked_less(array([self.load_mmh(DTime).Data for DTime in lDTime]), 0.0).filled(0.0)).mean(axis=0)
-
   def time_sum_mmh(self, iDTime, eDTime, dDTime):
     lDTime = ret_lDTime(iDTime, eDTime, dDTime)
-    return (ma.masked_less(array([self.load_mmh(DTime).Data for DTime in lDTime]), 0.0).filled(0.0)).sum(axis=0)
+    #return (ma.masked_less(array([self.load_mmh(DTime).Data for DTime in lDTime]), 0.0).filled(0.0)).sum(axis=0)
+    a2dat  = zeros([self.ny,self.nx],float32)
+    for DTime in lDTime:
+      a2dat = a2dat + ma.masked_less(self.load_mmh(DTime).Data,0.0).filled(0.0)
+    return a2dat
+
+  def time_ave_mmh(self, iDTime, eDTime, dDTime):
+    lDTime = ret_lDTime(iDTime, eDTime, dDTime)
+    #return (ma.masked_less(array([self.load_mmh(DTime).Data for DTime in lDTime]), 0.0).filled(0.0)).mean(axis=0)
+    a2dat  = zeros([self.ny,self.nx],float32)
+    for DTime in lDTime:
+      a2dat = a2dat + ma.masked_less(self.load_mmh(DTime).Data,0.0).filled(0.0)
+    return a2dat/len(lDTime)
+
 
   def time_a3dat_mmh(self, iDTime, eDTime, dDTime):
     lDTime = ret_lDTime(iDTime, eDTime, dDTime)
     return ma.masked_less(array([self.load_mmh(DTime).Data for DTime in lDTime]), 0.0).filled(0.0)
-
+    
   def time_countmiss(self, iDTime, eDTime, dDTime):
     lDTime = ret_lDTime(iDTime, eDTime, dDTime)
-    a3dat  = ma.masked_greater(array([self.load_mmh(DTime).Data for DTime in lDTime]), 0.0).filled(0.0)
-    a3dat  = ma.masked_less(a3dat, 0.0).filled(1.0)
-    return a3dat.sum(axis=0)
+    #a3dat  = ma.masked_greater(array([self.load_mmh(DTime).Data for DTime in lDTime]), 0.0).filled(0.0)
+    #a3dat  = ma.masked_less(a3dat, 0.0).filled(1.0)
+    a2dat  = zeros([self.ny,self.nx],float32)
+    for DTime in lDTime:
+      a2dat = a2dat + (ma.masked_less(self.load_mmh(DTime).Data, 0.0)*0.0).filled(1.0)
+    return a2dat
