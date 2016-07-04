@@ -18,15 +18,15 @@ class IBTrACS(object):
     if hostname in ["mizu","naam"]:
       self.baseDir  = "/tank/utsumi/data/ibtracs"
     #----------------
-    self.Versions= ["v03r04","v03r06"]
+    self.Versions= ["v03r04","v03r06","v03r08"]
 
 
-  def ret_path(self, Year, ver="v03r06"):
+  def ret_path(self, Year, ver="v03r08"):
     self.srcDir  = os.path.join(self.baseDir, ver)
     self.srcPath = self.srcDir + "/Year.%04d.ibtracs_all.%s.csv"%(Year,ver)
     return self
 
-  def ret_dlonlat(self,Year, ver="v03r06"):
+  def ret_dlonlat(self,Year, ver="v03r08"):
     lHour   = [0,6,12,18]
     lines   = []
     #-- open Y=Year-1 ----
@@ -83,7 +83,7 @@ class IBTrACS(object):
     #---
     return dout
   #################################################
-  def ret_dpyxy(self, Year, a1lon, a1lat, ver="v03r06"):
+  def ret_dpyxy(self, Year, a1lon, a1lat, ver="v03r08"):
     dlonlat = self.ret_dlonlat(Year,ver)
     lkey    = dlonlat.keys()
     dout    = {}
@@ -100,9 +100,9 @@ class IBTrACS(object):
 
 
 class IBTrACS_2D(IBTrACS):
-  def __init__(self, Year, a1lon, a1lat, miss=-9999.0, ver="v03r06"):
+  def __init__(self, Year, a1lon, a1lat, miss=-9999.0, ver="v03r08"):
     IBTrACS.__init__(self)
-    self.dpyxy   = self.ret_dpyxy(Year, a1lon, a1lat, ver="v03r06")
+    self.dpyxy   = self.ret_dpyxy(Year, a1lon, a1lat, ver="v03r08")
     self.Lat     = a1lat
     self.Lon     = a1lon
     self.ny      = len(a1lat)

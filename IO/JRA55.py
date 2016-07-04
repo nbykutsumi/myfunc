@@ -47,6 +47,11 @@ class Jra55(object):
       self.srcDir  = os.path.join(self.baseDir, "%s.anl_surf125"%(self.res), tstep, var, "%04d"%(Year), "%02d"%(Mon))
       self.srcPath = os.path.join(self.srcDir,  "anl_surf125.%s.%04d%02d%02d%02d.%s"%(var, Year, Mon, Day, Hour, self.res))
       self.prdType = "anl_surf125"
+    elif var in ["PWAT"]:
+      self.srcDir  = os.path.join(self.baseDir, "%s.anl_column125"%(self.res), tstep, var, "%04d"%(Year), "%02d"%(Mon))
+      self.srcPath = os.path.join(self.srcDir,  "anl_column125.%s.%04d%02d%02d%02d.%s"%(var, Year, Mon, Day, Hour, self.res))
+      self.prdType = "anl_column125"
+
 
     return self
 
@@ -61,6 +66,12 @@ class Jra55(object):
     if var in ["BRTMP"]:
       self.srcDir  = os.path.join(self.baseDir, "%s.fcst_surf125"%(self.res), "Monthly", var, "%04d"%(Year))
       self.srcPath = os.path.join(self.srcDir,  "fcst_surf125.%s.%04d%02d.%s"%(var, Year, Mon, self.res))
+    elif var in ["PWAT"]:
+      self.srcDir  = os.path.join(self.baseDir, "%s.anl_column125"%(self.res), "Monthly", var, "%04d"%(Year))
+      self.srcPath = os.path.join(self.srcDir,  "anl_column125.%s.%04d%02d.%s"%(var, Year, Mon, self.res))
+    elif var in ["APCP"]:
+      self.srcDir  = os.path.join(self.baseDir, "%s.fcst_phy2m125"%(self.res), "Monthly", var, "%04d"%(Year))
+      self.srcPath = os.path.join(self.srcDir,  "fcst_phy2m125.%s.%04d%02d.%s"%(var, Year, Mon, self.res))
 
     return self
 
@@ -95,5 +106,24 @@ class Jra55(object):
     self        = self.path_const(var)
     self.Data   = fromfile(self.srcPath, float32).reshape(self.ny, self.nx)
     return self
+
+  def path_clim8110(self, var, Mon, lev=False):
+    if var in ["PRMSL"]:
+      self.srcDir  = os.path.join(self.baseDir, "%s.anl_surf125"%(self.res), "clim8110")
+      self.srcPath = os.path.join(self.srcDir,  "anl_surf125.%s.%02d.%s"%(var, Mon, self.res))
+
+    elif var in ["vvel","vpot","vgrd","ugrd","tmp","strm","spfh","rh","relv","reld","hgt","depr"]:
+      self.srcDir  = os.path.join(self.baseDir, "%s.anl_p125"%(self.res), "clim8110")
+      self.srcPath = os.path.join(self.srcDir,  "anl_p125.%s.%04dhPa.%02d.%s"%(var, Mon, lev, self.res))
+    return self
+
+  def load_clim8110(self, var, DTime, lev=False):
+    self      = self.path_clim8110(var, DTime, lev)
+    self.Data = fromfile(self.srcPath, float32).reshape(self.ny, self.nx)
+    return self
+
+
+
+
 
  
