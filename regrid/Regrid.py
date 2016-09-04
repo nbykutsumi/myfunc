@@ -1,6 +1,7 @@
 from numpy import *
 from grids import *
 from upscale_fsub import *
+from bisect import bisect
 
 def biIntp(Lat,Lon,z,LAT,LON,miss=-999):
     #***********************
@@ -103,7 +104,8 @@ class UpScale(object):
         print "invalid miss_out:",miss_out
         sys.exit()
     
-    return upscale_fsub.upscale_fast(a2org.T\
+    return ma.masked_invalid(
+            upscale_fsub.upscale_fast(a2org.T\
              , self.a1xw_corres_fort, self.a1xe_corres_fort\
              , self.a1ys_corres_fort, self.a1yn_corres_fort\
              , self.a2areasw.T,       self.a2arease.T\
@@ -111,6 +113,6 @@ class UpScale(object):
              , self.nxUp,             self.nyUp\
              , pergrid, missflag, miss_in, miss_out\
              ).T
- 
+            ).filled(miss_out) 
 
  

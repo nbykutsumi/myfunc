@@ -72,6 +72,11 @@ class GSMaP(object):
     return glob(findPath)[0]
 
   def load_sateinfo(self, DTime):
+    """
+    positive: Microwave radiometer
+    0       : No satellite observation by both MW and IR
+    negative: Only IR observation (No microwave radiometer)
+    """
     srcPath = self.ret_path_sateinfo(DTime)
     Data   = flipud(fromfile(srcPath, int32).reshape(self.nyOrg, self.nxOrg))   # mm/hour
 

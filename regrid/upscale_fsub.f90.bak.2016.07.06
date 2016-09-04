@@ -893,32 +893,47 @@ end if
 
 !****************************************
 !---- y -----
-iout_start  = 1
-do ifin = 2, nlat_fin-1
-  lats_fin =  a1lats_fin(ifin)
-  latn_fin =  a1latn_fin(ifin)
-  ys_corres         = miss_int
-  yn_corres         = miss_int
-  do iout = iout_start, iout_start + 1
-    lats_out = a1lats_out(iout)
-    latn_out = a1latn_out(iout)
-    if ((lats_out .le. lats_fin).and.(lats_fin.lt.latn_out))then
-      ys_corres = iout
-      if (latn_fin .lt. latn_out)then
-        yn_corres   = iout
-        a1latm_fin(ifin)  = latn_fin
-      else
-        yn_corres   = iout +1
-        a1latm_fin(ifin)  = latn_out
-      end if
+
+if      (a1latn_fin(nlat_fin-1).lt.a1lats_out(1))then  
+  continue
+else if (a1lats_out(nlat_out).le.a1lats_out(2))then
+  continue
+else
+  
+  iout_start  = 1
+  do ifin = 2, nlat_fin-1
+    lats_fin =  a1lats_fin(ifin)
+    latn_fin =  a1latn_fin(ifin)
+    ys_corres         = miss_int
+    yn_corres         = miss_int
+  
+    if      (latn_fin.lt.a1lats_out(1))then
+      cycle
+    else if (lats_fin.ge.a1latn_out(nlat_out))then
       exit
     end if
+  
+    !do iout = iout_start, iout_start + 1
+    do iout = iout_start, iout_start + nlat_out
+      lats_out = a1lats_out(iout)
+      latn_out = a1latn_out(iout)
+      if ((lats_out .le. lats_fin).and.(lats_fin.lt.latn_out))then
+        ys_corres = iout
+        if (latn_fin .lt. latn_out)then
+          yn_corres   = iout
+          a1latm_fin(ifin)  = latn_fin
+        else
+          yn_corres   = iout +1
+          a1latm_fin(ifin)  = latn_out
+        end if
+        exit
+      end if
+    end do
+    a1ys_corres_fort(ifin)     = ys_corres
+    a1yn_corres_fort(ifin)     = yn_corres
+    iout_start                 = yn_corres
   end do
-  a1ys_corres_fort(ifin)     = ys_corres
-  a1yn_corres_fort(ifin)     = yn_corres
-  iout_start                 = yn_corres
-end do
-
+end if
 !-- ifin = 1 ------------
 a1ys_corres_fort(1) = 1
 latn_fin = a1latn_fin(1)
@@ -975,9 +990,10 @@ do iyfin = 1, nlat_fin
     !--------
   end do
 end do
-
+print *,"last", a1ys_corres_fort
 !--------------------
 return
 END SUBROUTINE upscale_prep
 !******************************************************************
+
 end module

@@ -107,7 +107,6 @@ nnx   = nx + 2*nrad
 nny   = ny + 2*nrad
 !a2large_in = 1.0
 !-----------------
-print *,nnx,nny, miss
 !-A-!
 a2large_in(1:nrad,1:nrad) = miss
 !-B-!
@@ -151,7 +150,6 @@ do ix = 1+nrad, nnx-nrad
     end if
   end do
 end do
-print *,shape(a2large_out)
 a2out = a2large_out(nrad+1:nx+nrad, nrad+1:ny+nrad)
 !a2out = a2large_out
 !
@@ -197,7 +195,6 @@ nnx   = nx + 2
 nny   = ny + 2
 !a2large_in = 1.0
 !-----------------
-print *,nnx,nny
 !-A-!
 a2large_in(1,1) = miss
 !-B-!
@@ -286,7 +283,6 @@ nnx   = nx + 4
 nny   = ny + 4
 !a2large_in = 1.0
 !-----------------
-print *,nnx,nny
 !-A-!
 a2large_in(1:2,1:2) = miss
 !-B-!
@@ -453,6 +449,8 @@ integer                                  ixfin, iyfin, ixout, iyout
 real,dimension(nlon_fin, nlat_fin)    :: a2areafin
 real,dimension(nlon_out, nlat_out)    :: a2areaout
 real                                     areafin_seg, areafin_all
+!-- parameter ------
+integer,parameter                     :: miss_int = -9999
 !-- init -----------
 a2areaout = 0.0
 a2out     = 0.0
@@ -468,18 +466,21 @@ if (pergrid .eq. 0)then
       areafin_seg  = a2areasw(ixfin,iyfin)
       a2areaout(ixout,iyout)  = a2areaout(ixout,iyout) + areafin_seg
       a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg
+
       !-- se -----
       ixout = a1xe_corres_fort(ixfin)
       iyout = a1ys_corres_fort(iyfin)
       areafin_seg  = a2arease(ixfin,iyfin)
       a2areaout(ixout,iyout)  = a2areaout(ixout,iyout) + areafin_seg
       a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg
+
       !-- nw -----
       ixout = a1xw_corres_fort(ixfin)
       iyout = a1yn_corres_fort(iyfin)
       areafin_seg  = a2areanw(ixfin,iyfin)
       a2areaout(ixout,iyout)  = a2areaout(ixout,iyout) + areafin_seg
       a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg
+
       !-- ne -----
       ixout = a1xe_corres_fort(ixfin)
       iyout = a1yn_corres_fort(iyfin)
@@ -514,15 +515,16 @@ else if (pergrid .eq. 1)then
       iyout = a1yn_corres_fort(iyfin)
       areafin_seg  = a2areane(ixfin,iyfin)
       a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg /areafin_all
+
     end do
   end do
 end if
-!-------------------
-! check miss
-!-------------------
+!!-------------------
+!! check miss
+!!-------------------
 if (missflag .eq.1)then
-  do iyfin = 1, nlat_fin
-    do ixfin = 1, nlon_fin
+  do iyfin = 2, nlat_fin-1
+    do ixfin = 2, nlon_fin-1
       if (a2fin(ixfin,iyfin) .eq. miss_in)then
         !-- sw -----
         ixout = a1xw_corres_fort(ixfin)
@@ -531,18 +533,77 @@ if (missflag .eq.1)then
         !-- se -----
         ixout = a1xe_corres_fort(ixfin)
         iyout = a1ys_corres_fort(iyfin)
-        areafin_seg  = a2arease(ixfin,iyfin)
         a2out(ixout,iyout)      = miss_out
         !-- nw -----
         ixout = a1xw_corres_fort(ixfin)
         iyout = a1yn_corres_fort(iyfin)
-        areafin_seg  = a2areanw(ixfin,iyfin)
         a2out(ixout,iyout)      = miss_out
         !-- ne -----
         ixout = a1xe_corres_fort(ixfin)
         iyout = a1yn_corres_fort(iyfin)
-        areafin_seg  = a2areane(ixfin,iyfin)
         a2out(ixout,iyout)      = miss_out
+      end if
+    end do
+  end do
+  !-- only northern and southern edges ---
+  do iyfin = 1, nlat_fin, nlat_fin-1
+    do ixfin = 1, nlon_fin
+      if (a2fin(ixfin,iyfin) .eq. miss_in)then
+        !-- sw -----
+        ixout = a1xw_corres_fort(ixfin)
+        iyout = a1ys_corres_fort(iyfin)
+        if ((ixout.ne.miss_int).and.(iyout.ne.miss_int))then
+          a2out(ixout,iyout)      = miss_out
+        end if
+        !-- se -----
+        ixout = a1xe_corres_fort(ixfin)
+        iyout = a1ys_corres_fort(iyfin)
+        if ((ixout.ne.miss_int).and.(iyout.ne.miss_int))then
+          a2out(ixout,iyout)      = miss_out
+        end if
+        !-- nw -----
+        ixout = a1xw_corres_fort(ixfin)
+        iyout = a1yn_corres_fort(iyfin)
+        if ((ixout.ne.miss_int).and.(iyout.ne.miss_int))then
+          a2out(ixout,iyout)      = miss_out
+        end if
+        !-- ne -----
+        ixout = a1xe_corres_fort(ixfin)
+        iyout = a1yn_corres_fort(iyfin)
+        if ((ixout.ne.miss_int).and.(iyout.ne.miss_int))then
+          a2out(ixout,iyout)      = miss_out
+        end if
+      end if
+    end do
+  end do
+  !-- only western and eastern edges except corners ---
+  do iyfin = 2, nlat_fin-1
+    do ixfin = 1, nlon_fin, nlon_fin-1
+      if (a2fin(ixfin,iyfin) .eq. miss_in)then
+        !-- sw -----
+        ixout = a1xw_corres_fort(ixfin)
+        iyout = a1ys_corres_fort(iyfin)
+        if ((ixout.ne.miss_int).and.(iyout.ne.miss_int))then
+          a2out(ixout,iyout)      = miss_out
+        end if
+        !-- se -----
+        ixout = a1xe_corres_fort(ixfin)
+        iyout = a1ys_corres_fort(iyfin)
+        if ((ixout.ne.miss_int).and.(iyout.ne.miss_int))then
+          a2out(ixout,iyout)      = miss_out
+        end if
+        !-- nw -----
+        ixout = a1xw_corres_fort(ixfin)
+        iyout = a1yn_corres_fort(iyfin)
+        if ((ixout.ne.miss_int).and.(iyout.ne.miss_int))then
+          a2out(ixout,iyout)      = miss_out
+        end if
+        !-- ne -----
+        ixout = a1xe_corres_fort(ixfin)
+        iyout = a1yn_corres_fort(iyfin)
+        if ((ixout.ne.miss_int).and.(iyout.ne.miss_int))then
+          a2out(ixout,iyout)      = miss_out
+        end if
       end if
     end do
   end do
@@ -738,6 +799,8 @@ real,parameter                       :: pi = 3.1416
 !-- init ----
 a1xw_corres_fort    = miss_int
 a1xe_corres_fort    = miss_int
+a1ys_corres_fort    = miss_int
+a1yn_corres_fort    = miss_int
 a1lonw_out          = miss_int
 a1lone_out          = miss_int
 a1lats_fin          = miss
@@ -805,103 +868,132 @@ do ifin = 2,nlat_fin -1
   a1latn_fin(ifin)   = (a1lat_fin(ifin+1) + a1lat_fin(ifin))*0.5
 end do
 if (globflag.eq.1)then
-  !a1lats_fin(1)        =  a1lat_fin(1) - (a1lat_fin(2)-a1lat_fin(1))*0.5
   a1lats_fin(1)        = -90.0
   a1latn_fin(1)        = (a1lat_fin(1) + a1lat_fin(2))*0.5
   a1lats_fin(nlat_fin) = (a1lat_fin(nlat_fin) + a1lat_fin(nlat_fin-1))*0.5
-  !a1latn_fin(nlat_fin) = (a1lat_fin(nlat_fin) + (a1lat_fin(nlat_fin-1) + a1lat_fin(nlat_fin))*0.5)
   a1latn_fin(nlat_fin) = 90.0
 else
   a1lats_fin(1)        =  a1lat_fin(1) - (a1lat_fin(2)-a1lat_fin(1))*0.5
   a1latn_fin(1)        = (a1lat_fin(1) + a1lat_fin(2))*0.5
   a1lats_fin(nlat_fin) = (a1lat_fin(nlat_fin) + a1lat_fin(nlat_fin-1))*0.5
   a1latn_fin(nlat_fin) =  a1lat_fin(nlat_fin) + (a1lat_fin(nlat_fin) - a1lat_fin(nlat_fin-1))*0.5
-  a1latn_fin(nlat_fin) = 90.0
 end if
 !****************************************
 !---- x -----
-iout_start  = 1
-do ifin = 2, nlon_fin-1
-  lonw_fin =  a1lonw_fin(ifin)
-  lone_fin =  a1lone_fin(ifin)
-  xw_corres         = miss_int
-  xe_corres         = miss_int
-  do iout = iout_start, iout_start + 1
-    lonw_out = a1lonw_out(iout)
-    lone_out = a1lone_out(iout)
-    if ((lonw_out .le. lonw_fin).and.(lonw_fin.lt.lone_out))then
-      xw_corres = iout
-      if (lone_fin .lt. lone_out)then
-        xe_corres   = iout
-        a1lonm_fin(ifin)  = lone_fin
-      else
-        xe_corres   = iout +1
-        a1lonm_fin(ifin)  = lone_out
-      end if
+!if      (a1lone_fin(nlon_fin-1).lt.a1lonw_out(1))then
+if      (a1lone_fin(nlon_fin).lt.a1lonw_out(1))then
+  continue
+!else if (a1lone_out(nlon_out).le.a1lonw_fin(2))then
+else if (a1lone_out(nlon_out).le.a1lonw_fin(1))then
+  continue
+else
+
+  iout_start  = 1
+  !do ifin = 2, nlon_fin-1
+  do ifin = 1, nlon_fin
+    lonw_fin =  a1lonw_fin(ifin)
+    lone_fin =  a1lone_fin(ifin)
+    xw_corres         = miss_int
+    xe_corres         = miss_int
+
+    if      (lone_fin.lt.a1lonw_out(1))then
+      cycle
+    else if (lonw_fin.ge.a1lone_out(nlon_out))then
       exit
     end if
+
+    !do iout = iout_start, iout_start + 1
+    do iout = iout_start, iout_start + nlon_out
+      lonw_out = a1lonw_out(iout)
+      lone_out = a1lone_out(iout)
+      if ((lonw_out .le. lonw_fin).and.(lonw_fin.lt.lone_out))then
+        xw_corres = iout
+        if (lone_fin .lt. lone_out)then
+          xe_corres   = iout
+          a1lonm_fin(ifin)  = lone_fin
+        else
+          xe_corres   = iout +1
+          a1lonm_fin(ifin)  = lone_out
+        end if
+        exit
+      end if
+    end do
+    a1xw_corres_fort(ifin)     = xw_corres
+    a1xe_corres_fort(ifin)     = xe_corres
+    iout_start                 = xe_corres
   end do
-  a1xw_corres_fort(ifin)     = xw_corres
-  a1xe_corres_fort(ifin)     = xe_corres
-  iout_start                 = xe_corres
-end do
-!-- ifin = 1 ------------
-lonw_fin = a1lonw_fin(1)
-if (a1lonw_out(1).le.lonw_fin)then
-  a1xw_corres_fort(1)     = 1
-else
-  a1xw_corres_fort(1)     = nlon_out
 end if
-
-lone_fin = a1lone_fin(1)
-if (lone_fin .lt. a1lone_out(1))then
-  a1xe_corres_fort(1) = 1
+!*** ifin=1 and last ******
+if (globflag.eq.0)then
+  !-- ifin = nlon_fin -----
+  if   (a1xe_corres_fort(nlon_fin).gt.nlon_out)then
+    a1xe_corres_fort(nlon_fin) = miss_int
+    a1lonm_fin(nlon_fin)  = a1lone_out(nlon_out)
+  else
+    continue
+  end if
+  !------------------------
 else
-  a1xe_corres_fort(1) = 2
+  !-- ifin = 1 ------------
+  lonw_fin = a1lonw_fin(1)
+  if (a1lonw_out(1).le.lonw_fin)then
+    a1xw_corres_fort(1)     = 1
+  else
+    a1xw_corres_fort(1)     = nlon_out
+  end if
+  
+  lone_fin = a1lone_fin(1)
+  if (lone_fin .lt. a1lone_out(1))then
+    a1xe_corres_fort(1) = 1
+  else
+    a1xe_corres_fort(1) = 2
+  end if
+  
+  if (a1xw_corres_fort(1).eq.a1xe_corres_fort(1))then
+    a1lonm_fin(1) = lone_fin
+  else if (a1xw_corres_fort(1) .eq. nlon_out )then
+    a1lonm_fin(1) = a1lonw_out(1)
+  else
+    a1lonm_fin(1) = a1lone_out(1)
+  end if
+  
+  !-- ifin = nlon_fin -----
+  lonw_fin = a1lonw_fin(nlon_fin)
+  if (a1lonw_out(nlon_out) .le. lonw_fin)then
+    a1xw_corres_fort(nlon_fin) = nlon_out
+  else
+    a1xw_corres_fort(nlon_fin) = nlon_out -1
+  end if
+  
+  lone_fin = a1lone_fin(nlon_fin)
+  if (lone_fin .lt. a1lone_out(nlon_fin))then
+    a1xe_corres_fort(nlon_fin) = nlon_out
+  else
+    a1xe_corres_fort(nlon_fin) = 1
+  end if
+  
+  if (a1xw_corres_fort(nlon_fin).eq.a1xe_corres_fort(nlon_fin))then
+    a1lonm_fin(nlon_fin) = lone_fin
+  else if (a1xw_corres_fort(nlon_fin) .eq. nlon_out )then
+    a1lonm_fin(nlon_fin) = a1lone_out(nlon_out)
+  else
+    a1lonm_fin(nlon_fin) = a1lone_out(nlon_out-1)
+  end if
 end if
-
-if (a1xw_corres_fort(1).eq.a1xe_corres_fort(1))then
-  a1lonm_fin(1) = lone_fin
-else if (a1xw_corres_fort(1) .eq. nlon_out )then
-  a1lonm_fin(1) = a1lonw_out(1)
-else
-  a1lonm_fin(1) = a1lone_out(1)
-end if
-
-!-- ifin = nlon_fin -----
-lonw_fin = a1lonw_fin(nlon_fin)
-if (a1lonw_out(nlon_out) .le. lonw_fin)then
-  a1xw_corres_fort(nlon_fin) = nlon_out
-else
-  a1xw_corres_fort(nlon_fin) = nlon_out -1
-end if
-
-lone_fin = a1lone_fin(nlon_fin)
-if (lone_fin .lt. a1lone_out(nlon_fin))then
-  a1xe_corres_fort(nlon_fin) = nlon_out
-else
-  a1xe_corres_fort(nlon_fin) = 1
-end if
-
-if (a1xw_corres_fort(nlon_fin).eq.a1xe_corres_fort(nlon_fin))then
-  a1lonm_fin(nlon_fin) = lone_fin
-else if (a1xw_corres_fort(nlon_fin) .eq. nlon_out )then
-  a1lonm_fin(nlon_fin) = a1lone_out(nlon_out)
-else
-  a1lonm_fin(nlon_fin) = a1lone_out(nlon_out-1)
-end if
-
 !****************************************
 !---- y -----
 
-if      (a1latn_fin(nlat_fin-1).lt.a1lats_out(1))then  
+!if      (a1latn_fin(nlat_fin-1).lt.a1lats_out(1))then  
+if      (a1latn_fin(nlat_fin).lt.a1lats_out(1))then  
   continue
-else if (a1lats_out(nlat_out).le.a1lats_out(2))then
+!else if (a1lats_out(nlat_out).le.a1lats_out(2))then
+else if (a1lats_out(nlat_out).le.a1lats_out(1))then
   continue
 else
   
   iout_start  = 1
-  do ifin = 2, nlat_fin-1
+  !do ifin = 2, nlat_fin-1
+  do ifin = 1, nlat_fin
     lats_fin =  a1lats_fin(ifin)
     latn_fin =  a1latn_fin(ifin)
     ys_corres         = miss_int
@@ -934,34 +1026,46 @@ else
     iout_start                 = yn_corres
   end do
 end if
-!-- ifin = 1 ------------
-a1ys_corres_fort(1) = 1
-latn_fin = a1latn_fin(1)
-if (latn_fin .lt. a1latn_out(1))then
-  a1yn_corres_fort(1) = 1
-else
-  a1yn_corres_fort(1) = 2
-end if
-
-if (a1yn_corres_fort(1) .eq. 1)then
-  a1latm_fin(1)  = a1latn_fin(1)
-else
-  a1latm_fin(1)  = a1latn_out(1)
-end if
-
-!-- ifin = nlat_fin -----
-a1yn_corres_fort(nlat_fin) = nlat_out
-lats_fin = a1lats_fin(nlat_fin)
-if (a1lats_out(nlat_out) .le. a1lats_fin(nlat_fin))then
-  a1ys_corres_fort(nlat_fin) = nlat_out
-else
-  a1ys_corres_fort(nlat_fin) = nlat_out -1
-end if
-
-if (a1ys_corres_fort(nlat_fin) .eq. nlat_out)then
-  a1latm_fin(nlat_fin)  = a1lats_fin(nlat_fin)
-else
-  a1latm_fin(nlat_fin)  = a1lats_out(nlat_out)
+!*** ifin=1 and last ******
+if (globflag.eq.0)then
+  !-- ifin = nlat_fin -----
+  if   (a1yn_corres_fort(nlat_fin).gt.nlat_out)then
+    a1yn_corres_fort(nlat_fin) = miss_int
+    a1latm_fin(nlat_fin)  = a1latn_out(nlat_out)
+  else
+    continue
+  end if
+  !------------------------
+else 
+  !-- ifin = 1 ------------
+  a1ys_corres_fort(1) = 1
+  latn_fin = a1latn_fin(1)
+  if (latn_fin .lt. a1latn_out(1))then
+    a1yn_corres_fort(1) = 1
+  else
+    a1yn_corres_fort(1) = 2
+  end if
+  
+  if (a1yn_corres_fort(1) .eq. 1)then
+    a1latm_fin(1)  = a1latn_fin(1)
+  else
+    a1latm_fin(1)  = a1latn_out(1)
+  end if
+  
+  !-- ifin = nlat_fin -----
+  a1yn_corres_fort(nlat_fin) = nlat_out
+  lats_fin = a1lats_fin(nlat_fin)
+  if (a1lats_out(nlat_out) .le. a1lats_fin(nlat_fin))then
+    a1ys_corres_fort(nlat_fin) = nlat_out
+  else
+    a1ys_corres_fort(nlat_fin) = nlat_out -1
+  end if
+  
+  if (a1ys_corres_fort(nlat_fin) .eq. nlat_out)then
+    a1latm_fin(nlat_fin)  = a1lats_fin(nlat_fin)
+  else
+    a1latm_fin(nlat_fin)  = a1lats_out(nlat_out)
+  end if
 end if
 !***************************
 ! calc area
@@ -975,6 +1079,7 @@ do iyfin = 1, nlat_fin
     lonw_fin = a1lonw_fin(ixfin)
     lone_fin = a1lone_fin(ixfin)
     lonm_fin = a1lonm_fin(ixfin)
+
     !!--------
     !a2areasw(ixfin, iyfin)  = cal_area_elip(lats_fin, latm_fin, lonw_fin, lonm_fin)
     !a2arease(ixfin, iyfin)  = cal_area_elip(lats_fin, latm_fin, lonm_fin, lone_fin)
@@ -990,9 +1095,9 @@ do iyfin = 1, nlat_fin
     !--------
   end do
 end do
-print *,"last", a1ys_corres_fort
 !--------------------
 return
 END SUBROUTINE upscale_prep
 !******************************************************************
+
 end module

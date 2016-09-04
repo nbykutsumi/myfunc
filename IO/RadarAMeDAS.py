@@ -35,6 +35,12 @@ class RadarAMeDAS(object):
     self.ny    = len(self.Lat)
     self.nx    = len(self.Lon) 
     self.miss  = -999.
+    self.prj   = prj
+
+  def loadRAmask(self):
+    srcDir  = "/tank/utsumi/data/RadarAMeDAS/mask"
+    srcPath = srcDir + "/RAmask.kubota.%s.%dx%d"%(self.prj,self.ny,self.nx)
+    return fromfile(srcPath, float32).reshape(self.ny, self.nx)
 
   def loadBackward_mmh(self,DTime, mask=False):
     """
