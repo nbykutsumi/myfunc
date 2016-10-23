@@ -1,4 +1,5 @@
 from   numpy import *
+import sys
 import struct
 
 def ret_lYM(iYM, eYM):
@@ -191,9 +192,9 @@ class CloudWNP(object):
 class MyCloudWNP(CloudWNP):
   def __init__(self, ver=1):
     CloudWNP.__init__(self)
-    self.baseDir = "/home/utsumi/mnt/well.share/CLOUDTYPE/MyWNP%d"%(ver)
+    self.baseDir = "/home/utsumi/mnt/well.share/CLOUDTYPE/MyWNP%s"%(ver)
 
-    if   ver == 1:
+    if   ver == "1":
       self.dclName ={0:"Clear Sky",   1:"Deep Convection"
            ,2:"High Clouds"
            ,3:"Mid & Low Clouds", 4:"Mixed Clouds", 99:"All"}
@@ -201,7 +202,7 @@ class MyCloudWNP(CloudWNP):
       self.dclShortName={0:"no", 1:"dc", 2:"hi"
                ,3:"ml", 4:"mx", 99:"All"}
 
-    elif ver == 2:
+    elif ver in ["2","3",".M.3"]:
       self.dclName ={0:"Clear Sky"
            ,1:"Deep Convection I"
            ,2:"Deep Convection II"
@@ -212,6 +213,12 @@ class MyCloudWNP(CloudWNP):
   
       self.dclShortName={0:"no", 1:"c1",2:"c2", 3:"hi"
                ,4:"ml", 5:"mx", 99:"All"}
+
+    else:
+      print "in CLOUDTYPE.py"
+      print "check ver=",ver, type(ver)
+      sys.exit()
+
 
     self.ncl     = len(self.dclName.keys())-1  
     self.licl    = range(self.ncl)
@@ -224,8 +231,9 @@ class MyCloudWNP(CloudWNP):
     Mon     = DTime.month
     Day     = DTime.day
     Hour    = DTime.hour
+    Minute  = DTime.minute
     srcDir  = self.baseDir + "/%04d%02d/%02d"%(Year,Mon,Day)
-    srcPath = srcDir + "/CLTYPE.%04d%02d%02d%02d.%dx%d"%(Year,Mon,Day,Hour,self.ny,self.nx)
+    srcPath = srcDir + "/CLTYPE.%04d%02d%02d%02d%02d.%dx%d"%(Year,Mon,Day,Hour,Minute,self.ny,self.nx)
     return fromfile(srcPath, int32).reshape(self.ny, self.nx)
 
 

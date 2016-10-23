@@ -456,7 +456,6 @@ a2areaout = 0.0
 a2out     = 0.0
 !-------------------
 a2areafin = a2areasw + a2arease + a2areanw + a2areane
-
 !
 if (pergrid .eq. 0)then
   do iyfin = 1,nlat_fin
@@ -464,39 +463,30 @@ if (pergrid .eq. 0)then
       !-- sw -----
       ixout = a1xw_corres_fort(ixfin)
       iyout = a1ys_corres_fort(iyfin)
-      if ((ixout.ne.miss_int).and.(iyout.ne.miss_int))then
-        areafin_seg  = a2areasw(ixfin,iyfin)
-        a2areaout(ixout,iyout)  = a2areaout(ixout,iyout) + areafin_seg
-        a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg
+      areafin_seg  = a2areasw(ixfin,iyfin)
+      a2areaout(ixout,iyout)  = a2areaout(ixout,iyout) + areafin_seg
+      a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg
 
-      end if
       !-- se -----
       ixout = a1xe_corres_fort(ixfin)
       iyout = a1ys_corres_fort(iyfin)
-      if ((ixout.ne.miss_int).and.(iyout.ne.miss_int))then
-        areafin_seg  = a2arease(ixfin,iyfin)
-        a2areaout(ixout,iyout)  = a2areaout(ixout,iyout) + areafin_seg
-        a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg
-      end if
+      areafin_seg  = a2arease(ixfin,iyfin)
+      a2areaout(ixout,iyout)  = a2areaout(ixout,iyout) + areafin_seg
+      a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg
 
       !-- nw -----
       ixout = a1xw_corres_fort(ixfin)
       iyout = a1yn_corres_fort(iyfin)
-      if ((ixout.ne.miss_int).and.(iyout.ne.miss_int))then
-        areafin_seg  = a2areanw(ixfin,iyfin)
-        a2areaout(ixout,iyout)  = a2areaout(ixout,iyout) + areafin_seg
-        a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg
-      end if
+      areafin_seg  = a2areanw(ixfin,iyfin)
+      a2areaout(ixout,iyout)  = a2areaout(ixout,iyout) + areafin_seg
+      a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg
 
       !-- ne -----
       ixout = a1xe_corres_fort(ixfin)
       iyout = a1yn_corres_fort(iyfin)
-      if ((ixout.ne.miss_int).and.(iyout.ne.miss_int))then
-        areafin_seg  = a2areane(ixfin,iyfin)
-        a2areaout(ixout,iyout)  = a2areaout(ixout,iyout) + areafin_seg
-        a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg
-      end if
-
+      areafin_seg  = a2areane(ixfin,iyfin)
+      a2areaout(ixout,iyout)  = a2areaout(ixout,iyout) + areafin_seg
+      a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg
     end do
   end do
   a2out  = a2out / a2areaout
@@ -508,35 +498,27 @@ else if (pergrid .eq. 1)then
       !-- sw -----
       ixout = a1xw_corres_fort(ixfin)
       iyout = a1ys_corres_fort(iyfin)
-      if ((ixout.ne.miss_int).and.(iyout.ne.miss_int))then
-        areafin_seg  = a2areasw(ixfin,iyfin)
-        a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg /areafin_all
-      end if
+      areafin_seg  = a2areasw(ixfin,iyfin)
+      a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg /areafin_all
       !-- se -----
       ixout = a1xe_corres_fort(ixfin)
       iyout = a1ys_corres_fort(iyfin)
-      if ((ixout.ne.miss_int).and.(iyout.ne.miss_int))then
-        areafin_seg  = a2arease(ixfin,iyfin)
-        a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg /areafin_all
-      end if
+      areafin_seg  = a2arease(ixfin,iyfin)
+      a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg /areafin_all
       !-- nw -----
       ixout = a1xw_corres_fort(ixfin)
       iyout = a1yn_corres_fort(iyfin)
-      if ((ixout.ne.miss_int).and.(iyout.ne.miss_int))then
-        areafin_seg  = a2areanw(ixfin,iyfin)
-        a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg /areafin_all
-      end if
+      areafin_seg  = a2areanw(ixfin,iyfin)
+      a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg /areafin_all
       !-- ne -----
       ixout = a1xe_corres_fort(ixfin)
       iyout = a1yn_corres_fort(iyfin)
-      if ((ixout.ne.miss_int).and.(iyout.ne.miss_int))then
-        areafin_seg  = a2areane(ixfin,iyfin)
-        a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg /areafin_all
-      end if
+      areafin_seg  = a2areane(ixfin,iyfin)
+      a2out(ixout,iyout)      = a2out(ixout,iyout) + a2fin(ixfin,iyfin)*areafin_seg /areafin_all
+
     end do
   end do
 end if
-
 !!-------------------
 !! check miss
 !!-------------------
@@ -905,6 +887,7 @@ if      (a1lone_fin(nlon_fin).lt.a1lonw_out(1))then
 else if (a1lone_out(nlon_out).le.a1lonw_fin(1))then
   continue
 else
+
   iout_start  = 1
   !do ifin = 2, nlon_fin-1
   do ifin = 1, nlon_fin
@@ -927,11 +910,9 @@ else
         xw_corres = iout
         if (lone_fin .lt. lone_out)then
           xe_corres   = iout
-          iout_start  = iout
           a1lonm_fin(ifin)  = lone_fin
         else
           xe_corres   = iout +1
-          iout_start  = iout +1
           a1lonm_fin(ifin)  = lone_out
         end if
         exit
@@ -939,7 +920,7 @@ else
     end do
     a1xw_corres_fort(ifin)     = xw_corres
     a1xe_corres_fort(ifin)     = xe_corres
-    !iout_start                 = xe_corres
+    iout_start                 = xe_corres
   end do
 end if
 !*** ifin=1 and last ******
@@ -1032,11 +1013,9 @@ else
         ys_corres = iout
         if (latn_fin .lt. latn_out)then
           yn_corres   = iout
-          iout_start  = iout
           a1latm_fin(ifin)  = latn_fin
         else
           yn_corres   = iout +1
-          iout_start  = iout +1
           a1latm_fin(ifin)  = latn_out
         end if
         exit
@@ -1044,7 +1023,7 @@ else
     end do
     a1ys_corres_fort(ifin)     = ys_corres
     a1yn_corres_fort(ifin)     = yn_corres
-    !iout_start                 = yn_corres
+    iout_start                 = yn_corres
   end do
 end if
 !*** ifin=1 and last ******
