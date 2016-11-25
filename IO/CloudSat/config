@@ -1,0 +1,11 @@
+[Defaults]
+dataroot       : /home/utsumi/mnt/well.share/CloudSat
+
+hdf4_module    : myfunc.IO.CloudSat.alien.read_hdf4.read_hdf4   ; absolute or relative path of function
+
+hdf4_vs_module : myfunc.IO.CloudSat.read_hdf4_vs.read_hdf4_vs   ; absolute or relative path of function
+
+cached         : update                      ; ['cached', 'cached-verbose', 'skip', 'update']
+cache_dir      : %(dataroot)s/cache.dim
+
+compression    : False                       ; [False, 'lz4'] 

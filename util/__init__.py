@@ -1,5 +1,23 @@
 from datetime import datetime, timedelta
+from calendar import timegm
+from numpy    import array, iterable, shape
 import os
+
+def dtime2tstmp(DTime):
+  if iterable(DTime) ==True:
+    Shape  = shape(DTime)
+    return array([timegm(dtime.timetuple())
+                  for dtime in DTime]).reshape(Shape)
+  else:
+    return timegm(DTime.timetuple())
+
+def tstmp2dtime(Tstmp):
+  if iterable(Tstmp) ==True:
+    Shape  = shape(Tstmp)
+    return array([datetime.utcfromtimestamp(tstmp)
+                  for tstmp in Tstmp]).reshape(Shape)
+  else:
+    return datetime.utcfromtimestamp(Tstamp)
 
 def mk_dir(sdir):
   try:
