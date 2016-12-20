@@ -108,7 +108,6 @@ class IMERG(object):
     Hour    = DTime.hour
     Minute  = DTime.minute
     srcDir  = self.rootDir + "/%04d/%02d/%02d"%(Year,Mon,Day)
-    srcPath = srcDir + "/3B-HHR.MS.MRG.3IMERG.20140402-S120000-E122959.0720.V03D.HDF5"
 
     #-- Name -----
     eDTime  = DTime + timedelta(minutes=29)
@@ -120,7 +119,6 @@ class IMERG(object):
     eTime   = "%02d%02d59"%(eHour,eMinute)
     TotalMinute= "%04d"%( (DTime - datetime(Year,Mon,Day,0,0)).total_seconds()/60.)
 
-    srcPath = srcDir + "/3B-HHR.MS.MRG.3IMERG.20140402-S120000-E122959.0720.V03D.HDF5"
     srcPath = srcDir + "/3B-HHR.MS.MRG.3IMERG.%s-S%s-E%s.%s.%sD.HDF5"\
                       %(Date, iTime, eTime, TotalMinute, self.VER)
 

@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from calendar import timegm
 from numpy    import array, iterable, shape
 import os
+import calendar
 
 def dtime2tstmp(DTime):
   if iterable(DTime) ==True:
@@ -28,6 +29,29 @@ def mk_dir(sdir):
 def ret_lDTime(iDTime,eDTime,dDTime):
   total_steps = int( (eDTime - iDTime).total_seconds() / dDTime.total_seconds() + 1 )
   return [iDTime + dDTime*i for i in range(total_steps)]
+
+def ret_lDTime_noleap(iDTime,eDTime,dDTime):
+  total_steps = int( (eDTime - iDTime).total_seconds() / dDTime.total_seconds() + 1 )
+
+  TstpLeap = []
+  for Year in range(iDTime.year, eDTime.year+1):
+      if calendar.isleap(Year):
+          itstp = ((datetime(Year,2,29,0)-iDTime).total_seconds()-1)\
+                 /dDTime.total_seconds() + 1 
+          etstp = ((datetime(Year,3,1,0)-iDTime).total_seconds()-1)\
+                 /dDTime.total_seconds() 
+
+          if itstp < 0: itstp=0
+          if etstp > total_steps-1: etstp = total_steps-1
+
+          TstpLeap = TstpLeap + range(int(itstp), int(etstp)+1)
+
+  ltstp = [i for i in range(total_steps) if i not in TstpLeap]
+
+  return [iDTime + dDTime*i for i in ltstp]
+
+
+
 
 def ret_dMonName():
   return {1:"Jan",2:"Feb",3:"Mar",4 :"Apr",5 :"May",6 :"Jun"

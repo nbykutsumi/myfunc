@@ -57,9 +57,8 @@ class Jra55(object):
 
 
   def load_6hr(self, var, DTime, lev=False):
-    self      = self.path_6hr(var, DTime, lev)
-    self.Data = fromfile(self.srcPath, float32).reshape(self.ny, self.nx)
-    return self
+    srcPath   = self.path_6hr(var, DTime, lev).srcPath
+    return fromfile(srcPath, float32).reshape(self.ny, self.nx)
 
 
   def path_mon(self, var, Year, Mon, lev=False):
@@ -76,9 +75,8 @@ class Jra55(object):
     return self
 
   def load_mon(self, var, Year, Mon, lev=False):
-    self      = self.path_mon(var, Year, Mon, lev)
-    self.Data = fromfile(self.srcPath, float32).reshape(self.ny, self.nx)
-    return self
+    srcPath   = path_mon(var, Year, Mon, lev).srcPath
+    return    fromfile(srcPath, float32).reshape(self.ny, self.nx)
 
 
   def time_ave(self, var, iDTime, eDTime, dDTime, lev=False, miss=False):
@@ -103,9 +101,8 @@ class Jra55(object):
     """
     var="topo", "land"
     """
-    self        = self.path_const(var)
-    self.Data   = fromfile(self.srcPath, float32).reshape(self.ny, self.nx)
-    return self
+    srcPath     = self.path_const(var).srcPath
+    return      fromfile(srcPath, float32).reshape(self.ny, self.nx)
 
   def path_clim8110(self, var, Mon, lev=False):
     if var in ["PRMSL"]:
@@ -118,9 +115,8 @@ class Jra55(object):
     return self
 
   def load_clim8110(self, var, DTime, lev=False):
-    self      = self.path_clim8110(var, DTime, lev)
-    self.Data = fromfile(self.srcPath, float32).reshape(self.ny, self.nx)
-    return self
+    srcPath   = self.path_clim8110(var, DTime, lev).srcPath
+    return fromfile(srcPath, float32).reshape(self.ny, self.nx)
 
 
 

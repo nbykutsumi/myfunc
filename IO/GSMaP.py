@@ -110,27 +110,31 @@ class GSMaP(object):
   def time_sum_mmh(self, iDTime, eDTime, dDTime):
     lDTime = ret_lDTime(iDTime, eDTime, dDTime)
     #return (ma.masked_less(array([self.load_mmh(DTime).Data for DTime in lDTime]), 0.0).filled(0.0)).sum(axis=0)
-    a2dat  = zeros([self.nyOrg,self.nxOrg],float32)
+    #a2dat  = zeros([self.nyOrg,self.nxOrg],float32)
+    a2dat  = zeros([self.ny,self.nx],float32)
     for DTime in lDTime:
       a2dat = a2dat + ma.masked_less(self.load_mmh(DTime),0.0).filled(0.0)
 
-    if self.BBox==False:
-      return a2dat
-    else:
-      return a2dat[self.iY:self.eY, self.iX:self.eX]
+    return a2dat
+    #if self.BBox==False:
+    #  return a2dat
+    #else:
+    #  return a2dat[self.iY:self.eY, self.iX:self.eX]
 
 
   def time_ave_mmh(self, iDTime, eDTime, dDTime):
     lDTime = ret_lDTime(iDTime, eDTime, dDTime)
     #return (ma.masked_less(array([self.load_mmh(DTime).Data for DTime in lDTime]), 0.0).filled(0.0)).mean(axis=0)
-    a2dat  = zeros([self.nyOrg,self.nxOrg],float32)
+    #a2dat  = zeros([self.nyOrg,self.nxOrg],float32)
+    a2dat  = zeros([self.ny,self.nx],float32)
     for DTime in lDTime:
       a2dat = a2dat + ma.masked_less(self.load_mmh(DTime),0.0).filled(0.0)
 
-    if self.BBox==False:
-      return a2dat  /len(lDTime)
-    else:
-      return a2dat[self.iY:self.eY, self.iX:self.eX] /len(lDTime)
+    return a2dat
+    #if self.BBox==False:
+    #  return a2dat  /len(lDTime)
+    #else:
+    #  return a2dat[self.iY:self.eY, self.iX:self.eX] /len(lDTime)
 
   def time_a3dat_mmh(self, iDTime, eDTime, dDTime):
     lDTime = ret_lDTime(iDTime, eDTime, dDTime)
@@ -148,12 +152,14 @@ class GSMaP(object):
     lDTime = ret_lDTime(iDTime, eDTime, dDTime)
     #a3dat  = ma.masked_greater(array([self.load_mmh(DTime).Data for DTime in lDTime]), 0.0).filled(0.0)
     #a3dat  = ma.masked_less(a3dat, 0.0).filled(1.0)
-    a2dat  = zeros([self.nyOrg,self.nxOrg],float32)
+    #a2dat  = zeros([self.nyOrg,self.nxOrg],float32)
+    a2dat  = zeros([self.ny,self.nx],float32)
     for DTime in lDTime:
       a2dat = a2dat + (ma.masked_less(self.load_mmh(DTime), 0.0)*0.0).filled(1.0)
 
-    if self.BBox==False:
-      return a2dat
-    else:
-      return a2dat[self.iY:self.eY, self.iX:self.eX]
+    return a2dat
+    #if self.BBox==False:
+    #  return a2dat
+    #else:
+    #  return a2dat[self.iY:self.eY, self.iX:self.eX]
 
