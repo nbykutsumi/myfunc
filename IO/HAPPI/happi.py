@@ -68,7 +68,6 @@ class Happi():
         # timeslice for no leap year (e.g.:2001)
         timeslice = (datetime(2001+dY, DTime.month, DTime.day, DTime.hour)
                    - datetime(2001, 1, 1, 6)).total_seconds() / (6*3600)
-
         if verbose ==True: print srcPath
 
         out = self.readslice_float32(srcPath, timeslice, self.ny, self.nx)
