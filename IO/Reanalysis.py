@@ -4,7 +4,7 @@ import JRA25
 
 def Reanalysis(model, res):
   if   model=="JRA55":
-    self = JRA55.Jra55(res)
+    self = JRA55.Jra55("145x288")
   elif (model=="JRA25")&(res=="sa.one"):
     self = JRA25.Jra25saone()
   elif (model=="JRA25")&(res=="bn"):

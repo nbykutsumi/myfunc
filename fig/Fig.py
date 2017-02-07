@@ -199,7 +199,77 @@ def DrawMapSimple(a2in, a1lat, a1lon, BBox=[[-90., 0.],[90., 360.]], vmin=False,
     ax.set_title("%s"%(stitle))
 
   # colorbar ----
-  plt.colorbar(im)
+  plt.colorbar(im, orientation="horizontal")
+
+  # Save -------------
+  plt.savefig(figname)
+  print figname
+
+
+#********************************************************
+def DrawVectorSimple(U, V, a1lat, a1lon, BBox=[[-90., 0.],[90., 360.]], figname="./temp.png",stitle=False, parallels=arange(-90,90+0.1, 30), meridians=arange(-180,360+0.1,30) ,maskcolor=False, scale=False, interval=False):
+
+  # Lat, Lon ------
+  a1lat = array( a1lat )
+  a1lon = array( a1lon )
+
+  latmin = a1lat[0]  - (a1lat[1]  - a1lat[0])*0.5
+  latmax = a1lat[-1] + (a1lat[-1] - a1lat[-2])*0.5
+  lonmin = a1lon[0]  - (a1lon[1]  - a1lon[0])*0.5
+  lonmax = a1lon[-1] + (a1lon[-1] - a1lon[-2])*0.5
+
+  a1LAT = r_[ array([latmin]), (a1lat[1:] + a1lat[:-1])*0.5, array([latmax])]
+  a1LON = r_[ array([lonmin]),   (a1lon[1:] + a1lon[:-1])*0.5, array([lonmax])]
+
+  X,Y   = meshgrid(a1LON, a1LAT)
+  # BBox --------
+  [lllat,lllon],[urlat,urlon] = BBox
+
+  # scale  ------
+  if type(scale) == bool:
+    scale = (abs(U).mean() + abs(V).mean())*0.5 
+    print "*"*50
+    print scale
+
+  # interval ---
+  if type(interval) != bool:
+    k  = interval
+    X  = X[::k, ::k]
+    Y  = Y[::k, ::k]
+    U  = U[::k, ::k]
+    V  = V[::k, ::k]
+
+  # Draw Map ----
+  fig  = plt.figure()
+  # color for masked grids --
+  if type(maskcolor) == bool:
+    maskcolor = "w"
+  else:
+    maskcolor = maskcolor
+
+  ax   = fig.add_axes([0.1,0.1,0.8,0.8], axisbg=maskcolor)
+  
+  M    = Basemap( resolution="l", llcrnrlat = lllat, llcrnrlon=lllon, urcrnrlat=urlat, urcrnrlon=urlon, ax=ax)
+  im   = M.quiver(X, Y, U, V
+                 ,units = "xy"
+                 ,scale = scale
+                 ,headwidth= scale*3
+                 ,pivot = "mid"
+                 )
+
+  # coastline ---
+  M.drawcoastlines()
+
+  # meridians and parrallels -
+  if type(parallels) != bool:
+    M.drawparallels(parallels, labels=[1,0,0,0], fontsize=10, linewidth=1)
+  if type(meridians) != bool:
+    M.drawparallels(parallels, labels=[1,0,0,0], fontsize=10, linewidth=1)
+  M.drawmeridians(meridians, labels=[0,0,0,1], fontsize=10, linewidth=1)
+
+  # title -------
+  if type(stitle) != bool:
+    ax.set_title("%s"%(stitle))
 
   # Save -------------
   plt.savefig(figname)

@@ -94,3 +94,41 @@ def list2csv(a):
     sout  = "\n".join(lline).strip()
   return sout
 
+def ret_lmon(season):
+  if type(season)==int:
+    lmon  = [season]
+  elif season.isdigit():
+    lmon  = [int(season)]
+  elif season == "DJF":
+    lmon  = [1,2, 12]
+  elif season == "MAM":
+    lmon  = [3,4,5]
+  elif season == "JJA":
+    lmon  = [6,7,8]
+  elif season == "SON":
+    lmon  = [9,10,11]
+  elif season == "ALL":
+    lmon  = [1,2,3,4,5,6,7,8,9,10,11,12]
+  elif type(season) == int:
+    lmon  = [season]
+  elif season == "NDJFMA":
+    lmon  = [11,12,1,2,3,4]
+  elif season == "MJJASO":
+    lmon  = [5,6,7,8,9,10]
+  elif season == "JJASON":
+    lmon  = [6,7,8,9,10,11]
+  elif season == "JJAS":
+    lmon  = [6,7,8,9]
+  elif season == "JASO":
+    lmon  = [7,8,9,10]
+  elif season == "JFMA":
+    lmon  = [1,2,3,4]
+  elif season == "DJFM":
+    lmon  = [12,1,2,3]
+  elif season == "NoJune":
+    lmon  = [1,2,3,4,5,7,8,9,10,11,12]
+  elif season == "NoJJ":
+    lmon  = [1,2,3,4,5,8,9,10,11,12]
+  else:
+    print "check season",season, type(season)
+  return lmon

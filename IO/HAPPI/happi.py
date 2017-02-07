@@ -23,6 +23,7 @@ class Happi():
         self.cfg._sections["Defaults"]
 
         self.baseDir = self.cfg.get("Defaults","baseDir")
+        self.miss    = -9999.
 
     def __call__(self, model, prj, expr, ens):
         """ 
@@ -108,12 +109,23 @@ class Happi():
 
         if verbose ==True: print srcPath
 
-        out = self.readslice_float32(srcPath, Mon, self.ny, self.nx)
+        out = self.readslice_float32(srcPath, Mon-1, self.ny, self.nx)
 
         if maskflag==True:
             return ma.masked_equal(out, self.miss)
         else:
             return out
+
+    def load_mon_prcp_mms(self, Year, Mon, maskflag=True, verbose=False):
+        return self.load_mon("prcp", Year, Mon, maskflag=maskflag, verbose=verbose)   # mm/s
+
+    def load_mon_prcp_mmh(self, Year, Mon, maskflag=True, verbose=False):
+        return self.load_mon("prcp", Year, Mon, maskflag=maskflag, verbose=verbose) * 60*60.
+
+    def load_mon_prcp_mmd(self, Year, Mon, maskflag=True, verbose=False):
+        return self.load_mon("prcp", Year, Mon, maskflag=maskflag, verbose=verbose) * 60*60.*24.
+
+
 
     def load_const(self, var, miss=False):
         """

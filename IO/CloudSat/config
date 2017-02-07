@@ -1,5 +1,5 @@
 [Defaults]
-dataroot       : /home/utsumi/mnt/well.share/CloudSat
+dataroot       : /home/utsumi/mnt/wellshare/CloudSat
 
 hdf4_module    : myfunc.IO.CloudSat.alien.read_hdf4.read_hdf4   ; absolute or relative path of function
 

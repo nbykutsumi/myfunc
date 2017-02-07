@@ -18,7 +18,7 @@ def ret_lDTime(iDTime,eDTime,dDTime):
 
 
 class Jra55(object):
-  def __init__(self, res="bn"):
+  def __init__(self, res="145x288"):
     #-- check host --
     hostname = socket.gethostname()
     if hostname == "well":  
@@ -31,6 +31,7 @@ class Jra55(object):
     self.ny  = len(self.Lat)
     self.nx  = len(self.Lon)
     self.res = res
+    self.miss= -9999.
 
   def path_6hr(self, var, DTime, lev=False):
     tstep = "6hr"
@@ -60,7 +61,6 @@ class Jra55(object):
     srcPath   = self.path_6hr(var, DTime, lev).srcPath
     return fromfile(srcPath, float32).reshape(self.ny, self.nx)
 
-
   def path_mon(self, var, Year, Mon, lev=False):
     if var in ["BRTMP"]:
       self.srcDir  = os.path.join(self.baseDir, "%s.fcst_surf125"%(self.res), "Monthly", var, "%04d"%(Year))
@@ -75,15 +75,25 @@ class Jra55(object):
     return self
 
   def load_mon(self, var, Year, Mon, lev=False):
-    srcPath   = path_mon(var, Year, Mon, lev).srcPath
+    srcPath   = self.path_mon(var, Year, Mon, lev).srcPath
     return    fromfile(srcPath, float32).reshape(self.ny, self.nx)
 
+  def load_mon_prcp_mmd(self, Year, Mon):
+    return self.load_mon("APCP", Year, Mon)  # mm/day
 
-  def time_ave(self, var, iDTime, eDTime, dDTime, lev=False, miss=False):
+  def load_mon_prcp_mmh(self, Year, Mon):
+    return self.load_mon("APCP", Year, Mon) /(24.) 
+
+  def load_mon_prcp_mms(self, Year, Mon):
+    return self.load_mon("APCP", Year, Mon) /(60*60*24.) 
+
+  def time_ave(self, var, iDTime, eDTime, dDTime, lev=False, miss=False, verbose=True):
     lDTime = ret_lDTime(iDTime, eDTime, dDTime)
-    print lDTime
+    if verbose==True:
+      print lDTime
+
     if type(miss)==bool:
-      return array([self.load_6hr(var,DTime,lev).Data for DTime in lDTime]).mean(axis=0)
+      return array([self.load_6hr(var,DTime,lev) for DTime in lDTime]).mean(axis=0)
     else:
       print "check this function!! in JRA55.py"
       sys.exit()
