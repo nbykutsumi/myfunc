@@ -52,13 +52,37 @@ class Jra55(object):
       self.srcDir  = os.path.join(self.baseDir, "%s.anl_column125"%(self.res), tstep, var, "%04d"%(Year), "%02d"%(Mon))
       self.srcPath = os.path.join(self.srcDir,  "anl_column125.%s.%04d%02d%02d%02d.%s"%(var, Year, Mon, Day, Hour, self.res))
       self.prdType = "anl_column125"
-
+    elif var in ["APCP"]:
+      """
+      APCP: mm/day
+      """
+      self.srcDir  = os.path.join(self.baseDir, "%s.fcst_phy2m125"%(self.res), tstep, var, "%04d"%(Year), "%02d"%(Mon))
+      self.srcPath = os.path.join(self.srcDir,  "fcst_phy2m125.%s.%04d%02d%02d%02d.%s"%(var, Year, Mon, Day, Hour, self.res))
+      self.prdType = "fcst_surf125"
 
     return self
 
 
   def load_6hr(self, var, DTime, lev=False):
     srcPath   = self.path_6hr(var, DTime, lev).srcPath
+    return fromfile(srcPath, float32).reshape(self.ny, self.nx)
+
+
+  def path_3hr(self, var, DTime, lev=False):
+    tstep = "3hr"
+    Year  = DTime.year
+    Mon   = DTime.month
+    Day   = DTime.day
+    Hour  = DTime.hour
+    if var in ["APCP"]:
+      self.srcDir  = os.path.join(self.baseDir, "%s.fcst_phy2m125"%(self.res), tstep, var, "%04d"%(Year), "%02d"%(Mon))
+      self.srcPath = os.path.join(self.srcDir,  "fcst_phy2m125.%s.%04d%02d%02d%02d.%s"%(var, Year, Mon, Day, Hour, self.res))
+      self.prdType = "fcst_surf125"
+
+    return self
+
+  def load_3hr(self, var, DTime, lev=False):
+    srcPath   = self.path_3hr(var, DTime, lev).srcPath
     return fromfile(srcPath, float32).reshape(self.ny, self.nx)
 
   def path_mon(self, var, Year, Mon, lev=False):

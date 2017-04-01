@@ -25,18 +25,18 @@ class Happi():
         self.baseDir = self.cfg.get("Defaults","baseDir")
         self.miss    = -9999.
 
-    def __call__(self, model, prj, expr, ens):
+    def __call__(self, model, expr, scen, ens):
         """ 
         model  : e.g.) "MIROC5"
-        prj    : e.g.) "C20"
-        expr   : e.g.) "ALL", "P15", "P20"
+        expr   : e.g.) "C20"
+        scen   : e.g.) "ALL", "P15", "P20"
         ens    : e.g.) 1, 2, ...
         """
         self.model = model
-        self.prj   = prj
         self.expr  = expr
+        self.scen  = scen
         self.ens   = ens
-        self.runName = "%s-%s-%03d"%(prj,expr,ens)
+        self.runName = "%s-%s-%03d"%(expr,scen,ens)
         self.Lat     = read_txtlist( os.path.join(self.baseDir, self.model, "lat.txt"))
         self.Lon     = read_txtlist( os.path.join(self.baseDir, self.model, "lon.txt"))
         self.ny      = 128
@@ -77,6 +77,21 @@ class Happi():
             return ma.masked_equal(out, self.miss)
         else:
             return out
+
+    def load_batch_6hr(self, var, Year, maskflag=True, verbose=False):
+        srcDir  = os.path.join(self.baseDir, self.model, self.runName
+                    ,"y%04d"%(Year), "6hr")
+
+        srcPath = os.path.join(srcDir
+                    ,"%s.sa.1460x%dx%d"%(var, self.ny, self.nx))
+
+        if verbose ==True: print srcPath
+
+        if maskflag==True:
+            out  = np.fromfile(srcPath, dtype="float32").reshape(1460, self.ny, self.nx)
+            return ma.masked_equal(out, self.miss)
+        else:
+            return np.fromfile(srcPath, dtype="float32").reshape(1460, self.ny, self.nx)
 
 
     def load_day(self, var, DTime, maskflag=True, verbose=False):

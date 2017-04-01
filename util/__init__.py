@@ -94,6 +94,14 @@ def list2csv(a):
     sout  = "\n".join(lline).strip()
   return sout
 
+def join_list_cols(ll):
+    lout = []
+    for l in ll:
+        lout.append(list(l))
+    return map(list, zip(*lout))
+         
+         
+
 def ret_lmon(season):
   if type(season)==int:
     lmon  = [season]

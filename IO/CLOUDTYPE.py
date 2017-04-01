@@ -192,7 +192,7 @@ class CloudWNP(object):
 class MyCloudWNP(CloudWNP):
   def __init__(self, ver=1):
     CloudWNP.__init__(self)
-    self.baseDir = "/home/utsumi/mnt/well.share/CLOUDTYPE/MyWNP%s"%(ver)
+    self.baseDir = "/home/utsumi/mnt/wellshare/CLOUDTYPE/MyWNP%s"%(ver)
 
     if   ver == "1":
       self.dclName ={0:"Clear Sky",   1:"Deep Convection"

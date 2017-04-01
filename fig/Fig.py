@@ -1,6 +1,7 @@
 from numpy import *
 from myfunc.fig import BoundaryNorm, BoundaryNormSymm
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
 import matplotlib
 from mpl_toolkits.basemap import Basemap
 from bisect import bisect
@@ -145,9 +146,10 @@ def DrawMap(a2in, a1lat, a1lon, BBox=[[-90.,0],[90.,360]], bnd=False, symm=True,
       plt.colorbar(im, boundaries= bnd_cbar, extend="both", cax=axcbar, orientation="horizontal", ticks=ticks)
     #----------
     figcbar.savefig(cbarname)
+    print cbarname
 
 #********************************************************
-def DrawMapSimple(a2in, a1lat, a1lon, BBox=[[-90., 0.],[90., 360.]], vmin=False, vmax=False, cmap="Spectral",figname="./temp.png",stitle=False, parallels=arange(-90,90+0.1, 30), meridians=arange(-180,360+0.1,30) ,maskcolor=False):
+def DrawMapSimple(a2in, a1lat, a1lon, BBox=[[-90., 0.],[90., 360.]], bnd=False, vmin=False, vmax=False, cmap="Spectral", extend="neither", white_minmax="neither", figname="./temp.png", cbarname=False, stitle=False, parallels=arange(-90,90+0.1, 30), meridians=arange(-180,360+0.1,30) ,maskcolor=False, figsize=False):
   # Lat, Lon ------
   a1lat = array( a1lat )
   a1lon = array( a1lon )
@@ -170,8 +172,90 @@ def DrawMapSimple(a2in, a1lat, a1lon, BBox=[[-90., 0.],[90., 360.]], vmin=False,
   if type(vmin) == bool:
     vmin = a2in.min()
 
+
+  ##-- color ---------------
+  if (type(bnd) != bool):
+    bnd = list(bnd)
+
+    if extend == "neither":
+      bnd  = bnd
+    elif extend == "both":
+      bnd  = [-1.0e+40] + bnd + [1.0e+40]
+    elif extend == "min":
+      bnd  = [-1.0e+40] + bnd
+    elif extend == "max":
+      bnd  = bnd + [+1.0e+40]
+    else:
+      print "check extend", extend
+      print __FILE__()
+      sys.exit()
+
+    cminst   = matplotlib.cm.get_cmap(cmap, len(bnd))
+    acm      = cminst( arange( len(bnd)))
+    lcm      = acm.tolist()
+    cmap     = matplotlib.colors.ListedColormap( lcm )
+    icent    = len(acm)/2 -1
+    print "*"*50
+    print "bnd=",bnd
+    print "acm=",acm
+    print len(acm)
+    print "incent",icent
+    if   white_minmax=="min":
+      acm[0]  =[1,1,1,1]
+    elif white_minmax=="max":
+      acm[-2] =[1,1,1,1]
+    elif white_minmax=="both":
+      acm[0]  =[1,1,1,1]
+      acm[-2] =[1,1,1,1]
+    elif white_minmax=="center":
+      acm[icent] =[1,1,1,1]
+
+    lcm      = acm.tolist()
+    cmap     = matplotlib.colors.ListedColormap( lcm )
+
+
+
+#    if extend == "neither":
+#      cminst   = matplotlib.cm.get_cmap(cmap, len(bnd))
+#      acm      = cminst( arange( len(bnd)))
+#    elif extend == "both":
+#      cminst   = matplotlib.cm.get_cmap(cmap, len(bnd)+2)
+#      acm      = cminst( arange( len(bnd)+2 ))
+#    elif extend in ["min","max"]:
+#      cminst   = matplotlib.cm.get_cmap(cmap, len(bnd)+1)
+#      acm      = cminst( arange( len(bnd)+1 ))
+#
+#    if   white_minmax=="min":
+#      lcm      = [[1,1,1,1]]+ acm.tolist()[1:]
+#    elif white_minmax=="max":
+#      lcm      = acm.tolist()[:-1] + [[1,1,1,1]]
+#    elif white_minmax=="both":
+#      lcm      = [[1,1,1,1]] + acm.tolist()[1:-1] + [[1,1,1,1]]
+#    elif white_minmax=="center":
+#      icent    = len(acm)/2
+#      print "*"*50
+#      print "bnd=",bnd
+#      print "acm=",acm
+#      print len(acm)
+#      print "incent",icent
+#      acm[icent] =[1,1,1,1]
+#      lcm      = acm.tolist()
+#
+#    else:
+#      lcm      = acm.tolist()
+#
+#    cmap     = matplotlib.colors.ListedColormap( lcm )
+
+
+  # BoundaryNorm
+  norm   = colors.BoundaryNorm(boundaries=bnd, ncolors=len(bnd)+1)
+
   # Draw Map ----
-  fig  = plt.figure()
+  if figsize == False:
+    fig  = plt.figure()
+  else:
+    fig  = plt.figure(figsize=figsize)
+
   # color for masked grids --
   if type(maskcolor) == bool:
     maskcolor = "w"
@@ -181,7 +265,7 @@ def DrawMapSimple(a2in, a1lat, a1lon, BBox=[[-90., 0.],[90., 360.]], vmin=False,
   ax   = fig.add_axes([0.1,0.1,0.8,0.8], axisbg=maskcolor)
   
   M    = Basemap( resolution="l", llcrnrlat = lllat, llcrnrlon=lllon, urcrnrlat=urlat, urcrnrlon=urlon, ax=ax)
-  im   = M.pcolormesh(X,Y,a2in, vmin=vmin, vmax=vmax, cmap=cmap)
+  im   = M.pcolormesh(X,Y,a2in, vmin=vmin, vmax=vmax, cmap=cmap, norm=norm)
 
 
   # coastline ---
@@ -198,13 +282,81 @@ def DrawMapSimple(a2in, a1lat, a1lon, BBox=[[-90., 0.],[90., 360.]], vmin=False,
   if type(stitle) != bool:
     ax.set_title("%s"%(stitle))
 
-  # colorbar ----
-  plt.colorbar(im, orientation="horizontal")
-
   # Save -------------
   plt.savefig(figname)
   print figname
 
+  # colorbar ----
+  if type(cbarname) != bool:
+    figcbar    = plt.figure(figsize=(5, 0.6))
+    axcbar     = figcbar.add_axes([0,0.4,1.0,0.58])
+    boundaries = bnd
+    plt.colorbar(im, boundaries=boundaries, extend=extend, cax=axcbar, orientation="horizontal")
+    figcbar.savefig(cbarname)
+    print cbarname
+
+
+
+
+##********************************************************
+#def DrawMapSimple(a2in, a1lat, a1lon, BBox=[[-90., 0.],[90., 360.]], vmin=False, vmax=False, cmap="Spectral",figname="./temp.png",stitle=False, parallels=arange(-90,90+0.1, 30), meridians=arange(-180,360+0.1,30) ,maskcolor=False):
+#  # Lat, Lon ------
+#  a1lat = array( a1lat )
+#  a1lon = array( a1lon )
+#
+#  latmin = a1lat[0]  - (a1lat[1]  - a1lat[0])*0.5
+#  latmax = a1lat[-1] + (a1lat[-1] - a1lat[-2])*0.5
+#  lonmin = a1lon[0]  - (a1lon[1]  - a1lon[0])*0.5
+#  lonmax = a1lon[-1] + (a1lon[-1] - a1lon[-2])*0.5
+#
+#  a1LAT = r_[ array([latmin]), (a1lat[1:] + a1lat[:-1])*0.5, array([latmax])]
+#  a1LON = r_[ array([lonmin]),   (a1lon[1:] + a1lon[:-1])*0.5, array([lonmax])]
+#
+#  X,Y   = meshgrid(a1LON, a1LAT)
+#  # BBox --------
+#  [lllat,lllon],[urlat,urlon] = BBox
+#
+#  # vmax, vmin --
+#  if type(vmax) == bool:
+#    vmax = a2in.max()
+#  if type(vmin) == bool:
+#    vmin = a2in.min()
+#
+#  # Draw Map ----
+#  fig  = plt.figure()
+#  # color for masked grids --
+#  if type(maskcolor) == bool:
+#    maskcolor = "w"
+#  else:
+#    maskcolor = maskcolor
+#
+#  ax   = fig.add_axes([0.1,0.1,0.8,0.8], axisbg=maskcolor)
+#  
+#  M    = Basemap( resolution="l", llcrnrlat = lllat, llcrnrlon=lllon, urcrnrlat=urlat, urcrnrlon=urlon, ax=ax)
+#  im   = M.pcolormesh(X,Y,a2in, vmin=vmin, vmax=vmax, cmap=cmap)
+#
+#
+#  # coastline ---
+#  M.drawcoastlines()
+#
+#  # meridians and parrallels -
+#  if type(parallels) != bool:
+#    M.drawparallels(parallels, labels=[1,0,0,0], fontsize=10, linewidth=1)
+#  if type(meridians) != bool:
+#    M.drawparallels(parallels, labels=[1,0,0,0], fontsize=10, linewidth=1)
+#  M.drawmeridians(meridians, labels=[0,0,0,1], fontsize=10, linewidth=1)
+#
+#  # title -------
+#  if type(stitle) != bool:
+#    ax.set_title("%s"%(stitle))
+#
+#  # colorbar ----
+#  plt.colorbar(im, orientation="horizontal")
+#
+#  # Save -------------
+#  plt.savefig(figname)
+#  print figname
+#
 
 #********************************************************
 def DrawVectorSimple(U, V, a1lat, a1lon, BBox=[[-90., 0.],[90., 360.]], figname="./temp.png",stitle=False, parallels=arange(-90,90+0.1, 30), meridians=arange(-180,360+0.1,30) ,maskcolor=False, scale=False, interval=False):
