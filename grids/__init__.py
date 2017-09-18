@@ -22,7 +22,7 @@ def shift_map(a2in, dy, dx, miss):
     return a2out
 
 
-def mk_mask_BBox(a1lat, a1lon, BBox):
+def mk_mask_BBox(a1lat, a1lon, BBox, miss=0):
     """
     Only for global map
     """
@@ -63,7 +63,7 @@ def mk_mask_BBox(a1lat, a1lon, BBox):
     ##-----------
     ny = len(a1lat)
     nx = len(a1lon)
-    a2regionmask  = zeros(nx*ny).reshape(ny, nx)
+    a2regionmask  = ones(nx*ny).reshape(ny, nx)*miss
 
     if ( xmax < xmin):
         a2regionmask[ymin:ymax+1, xmin: nx] = 1.0

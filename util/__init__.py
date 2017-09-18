@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from calendar import timegm
 from numpy    import array, iterable, shape
-import os
+import os, math
 import calendar
 
 def dtime2tstmp(DTime):
@@ -77,6 +77,19 @@ def ret_lYM(iYM, eYM):
     for Mon in lMon:
       lYM.append([Year,Mon])
   return lYM 
+
+def shift_YM(Year,Mon, dMon):
+  # dMon: can be positive and negative
+
+  Mon2 = Mon + dMon
+  if (Mon2)%12 ==0:
+    oMon   = 12
+    oYear  = int(Year + math.floor(Mon2/12)-1)
+  else:
+    oMon   = (Mon + dMon)%12
+    oYear  = int(Year + math.floor(Mon2/12))
+  return oYear,oMon 
+
 
 def array2csv(a):
   if len(a.shape)==1:

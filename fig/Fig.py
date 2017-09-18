@@ -195,11 +195,6 @@ def DrawMapSimple(a2in, a1lat, a1lon, BBox=[[-90., 0.],[90., 360.]], bnd=False, 
     lcm      = acm.tolist()
     cmap     = matplotlib.colors.ListedColormap( lcm )
     icent    = len(acm)/2 -1
-    print "*"*50
-    print "bnd=",bnd
-    print "acm=",acm
-    print len(acm)
-    print "incent",icent
     if   white_minmax=="min":
       acm[0]  =[1,1,1,1]
     elif white_minmax=="max":
@@ -289,7 +284,7 @@ def DrawMapSimple(a2in, a1lat, a1lon, BBox=[[-90., 0.],[90., 360.]], bnd=False, 
   # colorbar ----
   if type(cbarname) != bool:
     figcbar    = plt.figure(figsize=(5, 0.6))
-    axcbar     = figcbar.add_axes([0,0.4,1.0,0.58])
+    axcbar     = figcbar.add_axes([0.1,0.4,0.8,0.58])
     boundaries = bnd
     plt.colorbar(im, boundaries=boundaries, extend=extend, cax=axcbar, orientation="horizontal")
     figcbar.savefig(cbarname)
