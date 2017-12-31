@@ -1,7 +1,7 @@
 from numpy import *
 from datetime import datetime, timedelta
 import sys
-
+import glob
 import h5py
 
 def read_hdf5(srcPath, varName, Slice=None, verbose=True):
@@ -10,6 +10,7 @@ def read_hdf5(srcPath, varName, Slice=None, verbose=True):
     # PROGRAM    : read_hdf5.py 
     # CREATED BY : hjkim @IIS.2015-07-13 11:52:15.012270
     """
+    print srcPath
     h5      = h5py.File(srcPath, 'r')
 
     if Slice == None:   Slice = slice(None,None,None)
@@ -119,8 +120,13 @@ class IMERG(object):
     eTime   = "%02d%02d59"%(eHour,eMinute)
     TotalMinute= "%04d"%( (DTime - datetime(Year,Mon,Day,0,0)).total_seconds()/60.)
 
-    srcPath = srcDir + "/3B-HHR.MS.MRG.3IMERG.%s-S%s-E%s.%s.%sD.HDF5"\
-                      %(Date, iTime, eTime, TotalMinute, self.VER)
+    #srcPath = srcDir + "/3B-HHR.MS.MRG.3IMERG.%s-S%s-E%s.%s.%sD.HDF5"\
+    #                  %(Date, iTime, eTime, TotalMinute, self.VER)
+
+    #lsrcPath = glob.glob(srcDir + "/3B-HHR.MS.MRG.3IMERG.%s-S%s-E%s.%s.%s?.HDF5"\
+    lsrcPath = glob.glob(srcDir + "/3B-HHR.MS.MRG.3IMERG.%s-S%s-E%s.%s.%s*.HDF5"\
+                      %(Date, iTime, eTime, TotalMinute, self.VER))
+    srcPath  = sorted(lsrcPath)[-1]
 
     varName = "Grid/%s"%(var)
     #------------- 

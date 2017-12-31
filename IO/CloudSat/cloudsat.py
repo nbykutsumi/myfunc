@@ -150,6 +150,7 @@ class CloudSat( SearchGranules ):
             csData.srcPath.append(srcPath)
             csData.recLen.append( len(dtime) )    # number of data record for each file
 
+
         # Time binning
         if delT != None:
             dtBnd  = dtrange(sDTime, eDTime, delT)

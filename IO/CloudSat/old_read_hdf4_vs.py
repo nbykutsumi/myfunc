@@ -10,6 +10,7 @@ from    pyhdf      import HDF, VS
 from    itertools  import chain
 
 def read_hdf4_vs(srcPath, varName, Slice=None, verbose=True):
+
     if Slice == None:   Slice = slice(None,None,None)
 
     try:

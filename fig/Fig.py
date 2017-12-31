@@ -1,8 +1,10 @@
+i
+port matplotlib
+matplotlib.use("Agg")
 from numpy import *
 from myfunc.fig import BoundaryNorm, BoundaryNormSymm
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
-import matplotlib
 from mpl_toolkits.basemap import Basemap
 from bisect import bisect
 #********************************************************
@@ -243,7 +245,10 @@ def DrawMapSimple(a2in, a1lat, a1lon, BBox=[[-90., 0.],[90., 360.]], bnd=False, 
 
 
   # BoundaryNorm
-  norm   = colors.BoundaryNorm(boundaries=bnd, ncolors=len(bnd)+1)
+  if type(bnd) != bool:
+    norm   = colors.BoundaryNorm(boundaries=bnd, ncolors=len(bnd)+1)
+  else:
+    norm   = None
 
   # Draw Map ----
   if figsize == False:
@@ -285,8 +290,11 @@ def DrawMapSimple(a2in, a1lat, a1lon, BBox=[[-90., 0.],[90., 360.]], bnd=False, 
   if type(cbarname) != bool:
     figcbar    = plt.figure(figsize=(5, 0.6))
     axcbar     = figcbar.add_axes([0.1,0.4,0.8,0.58])
-    boundaries = bnd
-    plt.colorbar(im, boundaries=boundaries, extend=extend, cax=axcbar, orientation="horizontal")
+    if type(bnd) != bool:
+      boundaries = bnd
+      plt.colorbar(im, boundaries=boundaries, extend=extend, cax=axcbar, orientation="horizontal")
+    else:
+      plt.colorbar(im, extend=extend, cax=axcbar, orientation="horizontal")
     figcbar.savefig(cbarname)
     print cbarname
 

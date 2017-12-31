@@ -1,4 +1,5 @@
 import os, sys, socket
+import gzip
 from numpy import *
 from datetime import datetime, timedelta
 from glob import glob
@@ -8,7 +9,7 @@ def ret_lDTime(iDTime,eDTime,dDTime):
   return [iDTime + dDTime*i for i in range(total_steps)]
 
 class GSMaP(object):
-  def __init__(self, prj="standard",ver="v6", BBox=False):
+  def __init__(self, prj="standard",ver="v6", BBox=False, compressed=False):
     dprjabbr = {\
         "realtime"        :"nrt"\
        ,"standard"        :"mvk"\
@@ -19,6 +20,8 @@ class GSMaP(object):
     self.dprjabbr = dprjabbr
     self.prjabbr  = dprjabbr[prj]
     self.ver      = ver
+    self.compressed=compressed
+
     #-- check host --
     hostname = socket.gethostname()
     if hostname == "well":
@@ -30,10 +33,10 @@ class GSMaP(object):
     if hostname in ["mizu","naam"]:
       if prj == "realtime":
         self.baseDir          = "/data2/GSMaP/%s"%(prj)
-        self.baseDirSateinfo  = "/data2/GSMaP/%s.sateinfo"%(prj)
+        self.baseDirSateinfo  = "/data2/GSMaP/%s/sateinfo"%(prj)
       else:
         self.baseDir          = "/data2/GSMaP/%s/%s"%(prj,ver)
-        self.baseDirSateinfo  = "/data2/GSMaP/%s.sateinfo/%s"%(prj,ver)
+        self.baseDirSateinfo  = "/data2/GSMaP/%s/%s"%(prj,ver)
     #----------------
     self.LatOrg  = arange(-59.95, 59.95+0.01, 0.1)
     self.LonOrg  = arange(0.05, 359.95+0.01, 0.1)
@@ -67,8 +70,15 @@ class GSMaP(object):
     Hour = DTime.hour
     ver  = self.ver
 
-    srcDir = os.path.join(self.baseDirSateinfo, "hourly","%04d"%(Year), "%02d"%(Mon), "%02d"%(Day))
-    findPath=os.path.join(srcDir, "gsmap_%s.%04d%02d%02d.%02d00.%s.*.sateinfo.dat"%(self.prjabbr, Year,Mon,Day,Hour,self.ver))
+    if self.compressed == True:
+        sfx  = ".gz"
+    else:
+        sfx  = ""
+
+    srcDir = os.path.join(self.baseDirSateinfo, "sateinfo","%04d"%(Year), "%02d"%(Mon), "%02d"%(Day))
+    findPath=os.path.join(srcDir, "gsmap_%s.%04d%02d%02d.%02d00.%s.*.sateinfo.dat%s"%(self.prjabbr, Year,Mon,Day,Hour,ver, sfx))
+    print srcDir
+    print findPath
     return glob(findPath)[0]
 
   def load_sateinfo(self, DTime):
@@ -78,7 +88,13 @@ class GSMaP(object):
     negative: Only IR observation (No microwave radiometer)
     """
     srcPath = self.ret_path_sateinfo(DTime)
-    Data   = flipud(fromfile(srcPath, int32).reshape(self.nyOrg, self.nxOrg))   # mm/hour
+    if self.compressed==True:
+        f = gzip.open(srcPath, "rb")
+        strdat = f.read()
+        Data   = flipud(fromstring(strdat, dtype="int32").reshape(self.nyOrg, self.nxOrg))
+        f.close()
+    else: 
+        Data   = flipud(fromfile(srcPath, int32).reshape(self.nyOrg, self.nxOrg))   # mm/hour
 
     if self.BBox==False:
       return Data
@@ -91,8 +107,14 @@ class GSMaP(object):
     Day  = DTime.day
     Hour = DTime.hour
     ver  = self.ver
+
+    if self.compressed == True:
+        sfx  = ".gz"
+    else:
+        sfx  = ""
+
     srcDir = os.path.join(self.baseDir, "hourly","%04d"%(Year), "%02d"%(Mon), "%02d"%(Day))
-    findPath=os.path.join(srcDir, "gsmap_%s.%04d%02d%02d.%02d00.%s.*.dat"%(self.prjabbr, Year,Mon,Day,Hour,self.ver))
+    findPath=os.path.join(srcDir, "gsmap_%s.%04d%02d%02d.%02d00.%s.*.dat%s"%(self.prjabbr, Year,Mon,Day,Hour,ver,sfx))
     return glob(findPath)[0]
 
   def load_mmh(self, DTime):
@@ -100,7 +122,14 @@ class GSMaP(object):
     forward mean precipitation rate
     """
     srcPath= self.ret_path(DTime)
-    Data   = flipud(fromfile(srcPath, float32).reshape(self.nyOrg, self.nxOrg))   # mm/hour
+
+    if self.compressed==True:
+        f = gzip.open(srcPath, "rb")
+        strdat = f.read()
+        Data   = flipud(fromstring(strdat, dtype="float32").reshape(self.nyOrg, self.nxOrg))
+        f.close()
+    else:
+        Data   = flipud(fromfile(srcPath, float32).reshape(self.nyOrg, self.nxOrg))   # mm/hour
 
     if self.BBox==False:
       return Data
@@ -124,17 +153,13 @@ class GSMaP(object):
 
   def time_ave_mmh(self, iDTime, eDTime, dDTime):
     lDTime = ret_lDTime(iDTime, eDTime, dDTime)
-    #return (ma.masked_less(array([self.load_mmh(DTime).Data for DTime in lDTime]), 0.0).filled(0.0)).mean(axis=0)
-    #a2dat  = zeros([self.nyOrg,self.nxOrg],float32)
     a2dat  = zeros([self.ny,self.nx],float32)
     for DTime in lDTime:
+      print DTime
       a2dat = a2dat + ma.masked_less(self.load_mmh(DTime),0.0).filled(0.0)
 
-    return a2dat
-    #if self.BBox==False:
-    #  return a2dat  /len(lDTime)
-    #else:
-    #  return a2dat[self.iY:self.eY, self.iX:self.eX] /len(lDTime)
+    return a2dat / len(lDTime)
+
 
   def time_a3dat_mmh(self, iDTime, eDTime, dDTime):
     lDTime = ret_lDTime(iDTime, eDTime, dDTime)
@@ -143,8 +168,6 @@ class GSMaP(object):
     else:
       return ma.masked_less(array([self.load_mmh(DTime)[self.iY:self.eY, self.iX:self.eX]
              for DTime in lDTime]), 0.0).filled(0.0)
-
-
 
 
     

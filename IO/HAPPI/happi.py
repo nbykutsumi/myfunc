@@ -140,6 +140,22 @@ class Happi():
     def load_mon_prcp_mmd(self, Year, Mon, maskflag=True, verbose=False):
         return self.load_mon("prcp", Year, Mon, maskflag=maskflag, verbose=verbose) * 60*60.*24.
 
+    def load_Year(self, var, Year, maskflag=True, verbose=False):
+        srcDir  = os.path.join(self.baseDir, self.model, self.runName
+                    ,"y%04d"%(Year), "yr")
+
+        srcPath = os.path.join(srcDir
+                    ,"%s.sa.1x%dx%d"%(var, self.ny, self.nx))
+
+        if verbose ==True: print srcPath
+
+        out = np.fromfile(srcPath, "float32").reshape(self.ny, self.nx)
+
+        if maskflag==True:
+            return ma.masked_equal(out, self.miss)
+        else:
+            return out
+
 
 
     def load_const(self, var, miss=False):
