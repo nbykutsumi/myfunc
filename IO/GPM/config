@@ -1,6 +1,6 @@
 [Defaults]
-hdf4_module : myfunc.IO.GPyM.alien.read_hdf4.read_hdf4     ; absolute or relative path of function 
+hdf4_module : myfunc.IO.GPM.alien.read_hdf4.read_hdf4     ; absolute or relative path of function 
 
-hdf5_module : myfunc.IO.GPyM.alien.read_hdf5.read_hdf5     ; absolute or relative path of function 
+hdf5_module : myfunc.IO.GPM.alien.read_hdf5.read_hdf5     ; absolute or relative path of function 
 
 

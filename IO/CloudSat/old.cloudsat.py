@@ -72,15 +72,11 @@ class CloudSat( SearchGranules ):
         self.Resolve_CloudScenario = Resolve_CloudScenario
 
 
-    def __call__(self, varName, sDTime, eDTime, BBox=None, res=None, delT=None, LonCrdCent="A", verbose=True):
+    def __call__(self, varName, sDTime, eDTime, BBox=None, res=None, delT=None, verbose=True):
         '''
         res     : spa. res. of 2d-array   # not in service
         sDTime  : DTime bound left
         eDTime  : DTime bound right
-        LonCrdCent: Center longitude of map coordination.
-            "A"(tlantic): longitute takes range of -180 ~ 180 (CloudSat Default)
-            "P"(acific) : longitute takes range of 0 ~ 360
-
         '''
 
         csData    = CloudSat_data()
@@ -137,22 +133,8 @@ class CloudSat( SearchGranules ):
             '''
 
             mskLat = ma.masked_inside( lat, BBox[0][0], BBox[1][0] ).mask
-
-            [[lllat, lllon],[urlat,urlon]] = BBox
-            if ( (lllon<=180) & (urlon<=180) ):
-                mskLon  = ma.masked_outside( lon, BBox[0][1], BBox[1][1] ).mask
-            elif ( (lllon<=180) & (180<urlon) ):
-                mskLon  = ma.masked_inside( lon, urlon-360, lllon ).mask
-                atmp  = ma.masked_inside( lon, urlon-360, lllon )
-            elif ( (180<lllon) & (180<urlon) ):
-                mskLon  = ma.masked_outside( lon, lllon-360, urlon-360 ).mask
-            else:
-                print "Check BBox",BBox
-                print "by: search_granules.py"
-                sys.exit()
-
-            #msk    = mskLat * mskLon
-            msk    = mskLat + mskLon   # 2018/1/15
+            mskLon = ma.masked_inside( lon, BBox[0][1], BBox[1][1] ).mask
+            msk    = mskLat * mskLon
 
 
             if type(msk)== np.bool_:  # if msk == False
@@ -168,10 +150,6 @@ class CloudSat( SearchGranules ):
             csData.srcPath.append(srcPath)
             csData.recLen.append( len(dtime) )    # number of data record for each file
 
-        if LonCrdCent =="A":
-            pass
-        elif LonCrdCent=="P":
-            Lon =(ma.masked_inside(array(Lon), 0, 180)+360).data
 
         # Time binning
         if delT != None:

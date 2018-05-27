@@ -8,6 +8,7 @@ class MERGIR(object):
         hostname = socket.gethostname()
         if hostname == "mizu":
             baseDir = "/home/utsumi/mnt/wellshare/data/MERGIR"
+            #baseDir = "/work/a01/utsumi/data/MERGIR"
         elif hostname == "well":
             baseDir = "/media/disk2/share/data/MERGIR"
         else:

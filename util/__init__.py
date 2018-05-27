@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
 from calendar import timegm
-from numpy    import array, iterable, shape
+from numpy    import ma, array, iterable, shape
 import os, math
 import calendar
+import numpy as np
 
 def dtime2tstmp(DTime):
   if iterable(DTime) ==True:
@@ -51,6 +52,11 @@ def ret_lDTime_noleap(iDTime,eDTime,dDTime):
   return [iDTime + dDTime*i for i in ltstp]
 
 
+def ret_day_of_year(DTime):
+    Year   = DTime.year
+    DTime0 = datetime(Year,1,1,0)
+    dDTime = DTime - DTime0
+    return dDTime.days + 1
 
 
 def ret_dMonName():
@@ -113,7 +119,6 @@ def join_list_cols(ll):
         lout.append(list(l))
     return map(list, zip(*lout))
          
-         
 
 def ret_lmon(season):
   if type(season)==int:
@@ -153,3 +158,98 @@ def ret_lmon(season):
   else:
     print "check season",season, type(season)
   return lmon
+
+
+def nhourly2monthly(a3in, nh, calc="mean",miss_in=None, miss_out=None):
+    # nh : n-hourly
+    # calc: "mean","sum"
+    # if miss_in !=None and miss_out==None, output will be filled with miss_in
+    #
+    dtype   = a3in.dtype
+    per_day = int(24/nh)
+    nstep, ny, nx = a3in.shape
+    if nstep/per_day == 365:
+        Year = 1999  # just for calc
+    elif nstep/per_day == 366:
+        Year = 2000  # ust for calc
+
+    if miss_in !=None:
+        a3in = ma.masked_equal(a3in, miss_in)
+
+    a3mon = np.empty([12,ny,nx], dtype=dtype)
+    for Mon in range(1,12+1):
+        iDay = 1
+        eDay = calendar.monthrange(Year,Mon)[1]
+        iDTime = datetime(Year,Mon,iDay,0)
+        eDTime = datetime(Year,Mon,eDay,0)
+        iDOY   = ret_day_of_year(iDTime)
+        eDOY   = ret_day_of_year(eDTime)
+        ik     = (iDOY-1)*per_day
+        ek     = (eDOY-1+1)*per_day
+        if calc=="mean":
+            a2mon = a3in[ik:ek,:,:].mean(axis=0)
+        elif calc=="sum":
+            a2mon = a3in[ik:ek,:,:].sum(axis=0)
+        elif calc=="std":
+            a2mon = a3in[ik:ek,:,:].std(axis=0)
+        else:
+            print 'check calc', calc
+
+        if ma.isMaskedArray(a2mon):
+            if miss_out !=None:
+                a2mon = a2mon.filled(miss_out)
+
+        a3mon[Mon-1,:,:] = a2mon
+    return a3mon
+
+
+def nhourly2day2monthly(a3in, nh, calc="mean",miss_in=None, miss_out=None):
+    # nh : n-hourly
+    # calc: "mean","sum"
+    # if miss_in !=None and miss_out==None, output will be filled with miss_in
+    #
+    dtype   = a3in.dtype
+    per_day = int(24/nh)
+    nstep, ny, nx = a3in.shape
+    if nstep/per_day == 365:
+        Year = 1999  # just for calc
+    elif nstep/per_day == 366:
+        Year = 2000  # just for calc
+
+    if miss_in !=None:
+        a3in = ma.masked_equal(a3in, miss_in)
+
+    a3mon = np.empty([12,ny,nx], dtype=dtype)
+    for Mon in range(1,12+1):
+        iDay = 1
+        eDay = calendar.monthrange(Year,Mon)[1]
+        iDTime = datetime(Year,Mon,iDay,0)
+        eDTime = datetime(Year,Mon,eDay,0)
+        iDOY   = ret_day_of_year(iDTime)
+        eDOY   = ret_day_of_year(eDTime)
+        ik     = (iDOY-1)
+        ek     = (eDOY-1+1)
+        a4tmp  = a3in.reshape(-1,per_day,ny,nx)
+
+
+
+        if calc=="mean":
+            a2mon = a4tmp[ik:ek,:,:].mean(axis=1).mean(axis=0)
+        elif calc=="sum":
+            a2mon = a4tmp[ik:ek,:,:].mean(axis=1).sum(axis=0)
+        elif calc=="std":
+            a2mon = a4tmp[ik:ek,:,:].mean(axis=1).std(axis=0)
+        else:
+            print 'check calc', calc
+
+        if ma.isMaskedArray(a2mon):
+            if miss_out !=None:
+                a2mon = a2mon.filled(miss_out)
+
+        a3mon[Mon-1,:,:] = a2mon
+    return a3mon
+
+
+
+
+

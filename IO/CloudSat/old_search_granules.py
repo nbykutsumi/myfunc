@@ -10,7 +10,7 @@ from     get_path        import get_path
 from     get_gtrack_dim  import get_gtrack_dim
 
 class SearchGranules( object ):
-    def search_granules(self, srcDir, sDTime, eDTime, BBox=[[-90,-180],[90,180]], thresh=0.001, verbose=True):
+    def search_granules(self, srcDir, sDTime, eDTime, BBox=[[-90,-180],[90,180]],  verbose=True):
         '''
         BBox    : [[lllat,lllon], [urlat,urlon]]    /* lat: -90 ~ 90 */
                                                     /* lon: -180 ~ 180 */
@@ -27,7 +27,6 @@ class SearchGranules( object ):
         gtrkDim = [get_gtrack_dim(path, self.func_read, self.cached, self.cacheDir)
                            for path in srcPATH]
         '''
-
         gtrkDim = [get_gtrack_dim(path, self.func_read_vs, self.cached, self.cacheDir, verbose=verbose)
                            for path in srcPATH]
 
@@ -50,10 +49,11 @@ class SearchGranules( object ):
                                 lon[idx],
                                 idx
                                 ])
-
-                print '* [V] ground track dimension (%s): %s'%(self.cached,path)
+                if verbose==True:
+                    print '* [V] ground track dimension (%s): %s'%(self.cached,path)
             else:
-                print '* [_] ground track dimension (%s): %s'%(self.cached,path)
+                if verbose==False:
+                    print '* [_] ground track dimension (%s): %s'%(self.cached,path)
 
         summary = '| [{}] granules intersects domain {} out of [{}] total between ({}-{}) |\n'    \
                   .format( len(Granule), tuple(BBox), len(srcPATH), sDTime, eDTime )

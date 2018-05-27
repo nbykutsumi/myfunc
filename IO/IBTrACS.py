@@ -18,7 +18,7 @@ class IBTrACS(object):
     if hostname in ["mizu","naam"]:
       self.baseDir  = "/tank/utsumi/data/ibtracs"
     #----------------
-    self.Versions= ["v03r04","v03r06","v03r08"]
+    self.Versions= ["v03r04","v03r06","v03r08","v03r10"]
 
 
   def ret_path(self, Year, ver="v03r08"):

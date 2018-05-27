@@ -10,7 +10,7 @@ from     get_path        import get_path
 from     get_gtrack_dim  import get_gtrack_dim
 
 class SearchGranules( object ):
-    def search_granules(self, srcDir, sDTime, eDTime, BBox=[[-90,-180],[90,180]], thresh=0.001, verbose=True):
+    def search_granules(self, srcDir, sDTime, eDTime, BBox=[[-90,-180],[90,180]],  verbose=True):
         '''
         BBox    : [[lllat,lllon], [urlat,urlon]]    /* lat: -90 ~ 90 */
                                                     /* lon: -180 ~ 180 */
@@ -27,7 +27,6 @@ class SearchGranules( object ):
         gtrkDim = [get_gtrack_dim(path, self.func_read, self.cached, self.cacheDir)
                            for path in srcPATH]
         '''
-
         gtrkDim = [get_gtrack_dim(path, self.func_read_vs, self.cached, self.cacheDir, verbose=verbose)
                            for path in srcPATH]
 
@@ -35,13 +34,24 @@ class SearchGranules( object ):
         Granule           = deque([])
         for dtime, lat, lon, path in map(None, DTime, Lat, Lon, srcPATH):
 
+            [[lllat, lllon],[urlat,urlon]] = BBox
+            if ( (lllon<=180) & (urlon<=180) ):
+                mskLon  = ma.masked_outside( lon, BBox[0][1], BBox[1][1] ).mask
+            elif ( (lllon<=180) & (180<urlon) ):
+                mskLon  = ma.masked_inside( lon, urlon-360, lllon ).mask
+                atmp  = ma.masked_inside( lon, urlon-360, lllon )
+            elif ( (180<lllon) & (180<urlon) ):
+                mskLon  = ma.masked_outside( lon, lllon-360, urlon-360 ).mask
+            else:
+                print "Check BBox",BBox
+                print "by: search_granules.py"
+                sys.exit()
+            #--
             mskLat  = ma.masked_outside( lat, BBox[0][0], BBox[1][0] ).mask
-            mskLon  = ma.masked_outside( lon, BBox[0][1], BBox[1][1] ).mask
             mskTime = ma.masked_outside( dtime, sDTime, eDTime).mask
-
             #mask    = (mskLat + mskLon).all(1) + mskTime
-            mask    = (mskLat + mskLon).all(0) + mskTime
-
+            #mask    = (mskLat + mskLon).all(0) + mskTime
+            mask    = mskLat + mskLon + mskTime
             if not mask.all():
                 idx = ma.array( arange(dtime.size), "int", mask=mask).compressed()
                 Granule.append([path,
@@ -51,9 +61,11 @@ class SearchGranules( object ):
                                 idx
                                 ])
 
-                print '* [V] ground track dimension (%s): %s'%(self.cached,path)
+                if verbose==True:
+                    print '* [V] ground track dimension (%s): %s'%(self.cached,path)
             else:
-                print '* [_] ground track dimension (%s): %s'%(self.cached,path)
+                if verbose==False:
+                    print '* [_] ground track dimension (%s): %s'%(self.cached,path)
 
         summary = '| [{}] granules intersects domain {} out of [{}] total between ({}-{}) |\n'    \
                   .format( len(Granule), tuple(BBox), len(srcPATH), sDTime, eDTime )

@@ -39,7 +39,7 @@ class Jra55(object):
     Mon   = DTime.month
     Day   = DTime.day
     Hour  = DTime.hour
-    if   var in ["spfh","tmp","ugrd","vgrd"]:  # "anl_pa125"
+    if   var in ["spfh","tmp","ugrd","vgrd","hgt"]:  # "anl_pa125"
       self.srcDir  = os.path.join(self.baseDir, "%s.anl_p125"%(self.res), tstep, var, "%04d"%(Year), "%02d"%(Mon))
       self.srcPath = os.path.join(self.srcDir,  "anl_p125.%s.%04dhPa.%04d%02d%02d%02d.%s"%(var, lev, Year, Mon, Day, Hour, self.res))
       self.prdType = "anl_p125"
@@ -59,6 +59,10 @@ class Jra55(object):
       self.srcDir  = os.path.join(self.baseDir, "%s.fcst_phy2m125"%(self.res), tstep, var, "%04d"%(Year), "%02d"%(Mon))
       self.srcPath = os.path.join(self.srcDir,  "fcst_phy2m125.%s.%04d%02d%02d%02d.%s"%(var, Year, Mon, Day, Hour, self.res))
       self.prdType = "fcst_surf125"
+    else:
+        print "check var",var
+        print "by JRA55.py"
+        print sys.exit()
 
     return self
 

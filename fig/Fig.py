@@ -1,5 +1,4 @@
-i
-port matplotlib
+import matplotlib
 matplotlib.use("Agg")
 from numpy import *
 from myfunc.fig import BoundaryNorm, BoundaryNormSymm

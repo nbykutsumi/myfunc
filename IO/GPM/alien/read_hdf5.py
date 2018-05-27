@@ -1,10 +1,10 @@
 #! /usr/bin/python
 #--------------------------------------------------------------------
-# PROGRAM    : read_hdf4.py
-# CREATED BY : hjkim @IIS.2015-07-15 15:21:18.949532
+# PROGRAM    : read_hdf5.py
+# CREATED BY : hjkim @IIS.2015-07-13 11:52:15.012270
 # MODIFED BY :
 #
-# USAGE      : $ ./read_hdf4.py
+# USAGE      : $ ./read_hdf5.py
 #
 # DESCRIPTION:
 #------------------------------------------------------cf0.2@20120401
@@ -13,46 +13,35 @@
 import  os,sys
 from    optparse        import OptionParser
 
-from    pyhdf           import SD
+import  h5py
 
 
-def read_hdf4(srcPath, varName, Slice=None, verbose=False):
-    h4      = SD.SD(srcPath)# 'r')
+def read_hdf5(srcPath, varName, Slice=None, verbose=True):
+    h5      = h5py.File(srcPath, 'r')
 
     if Slice == None:   Slice = slice(None,None,None)
 
-    '''
-    h4Var   = h4.select(varName)
-    print dir(h4Var)
-    print  h4Var.dimensions()
-
-    sys.exit()
-    '''
-
     try:
-        h4Var   = h4.select(varName)
-        aOut    = h4Var[:][Slice]
+        h5Var   = h5[varName]
+        aOut    = h5Var[Slice]
 
     except:
         print '!'*80
         print 'I/O Error'
         print 'Blank File? %s'%srcPath
         print 'Blank array will be returned [ %s ]'%varName
-        print h4Var.dimensions()
+        print h5Var.shape
         print Slice
         print '!'*80
 
-        #raise ValueError
+        raise ValueError
 
     if verbose  == True:
-        print '\t[READ_HDF4] %s [%s] -> %s'%( srcPath, varName, aOut.shape)
-       # print '\t[READ_HDF4] %s %s -> %s'%( srcPath, h4Var.dimensions(), aOut.shape)
+        print '\t[READ_HDF5] %s [%s] -> %s'%( srcPath, varName, aOut.shape)
 
-    #h4.close()
-    h4.end()  # by Utsumi 2017/8/6
+    h5.close()
 
     return aOut
-
 
 
 def main(args,opts):
