@@ -6,7 +6,7 @@ from    alien        import read_hdf5
 import  functions
 
 class L2_DPR(object):
-    def __init__(self, sensor='GPM.DPR', prdName='2A.DPR',version='05',minorversion='A'):
+    def __init__(self, sensor='GPM.DPR', prdName='2A.DPR',version='05',minorversion='A',agency='NASA'):
         self.sensor  = sensor
         self.prdName = prdName
         self.version = version
@@ -19,6 +19,8 @@ class L2_DPR(object):
         elif self.hostname=="mizu":
             self.rootDir  = "/home/utsumi/mnt/wellshare/data/GPM"
             #self.rootDir  = "/work/a01/utsumi/data/GPM"
+        elif self.hostname=="shui":
+            self.rootDir  = "/work/hk01/PMM/%s"%(agency)
 
         ## read_hdf function
         self.func_read  = read_hdf5.read_hdf5
@@ -38,8 +40,14 @@ class L2_DPR(object):
                                "%02d"%(Mon),\
                                "%02d"%(Day)\
                               )
-        
-        lPath  = glob.glob(srcDir+"/*_%s.h5"%(self.fullversion))
+
+        if agency=='JAXA':        
+            lPath  = glob.glob(srcDir+"/*_%s.h5"%(self.fullversion))
+        elif agency=='NASA':
+            lPath  = glob.glob(srcDir+"/*.%s.HDF5"%(self.fullversion))
+        else:
+            print 'check agancy',agency
+            sys.exit()
         return lPath
 
     def load_dtime_granule(self, srcPath=None, scan=None):

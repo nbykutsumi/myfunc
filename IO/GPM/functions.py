@@ -8,6 +8,7 @@ def load_file_hdf5(srcPath):
 
 def get_dtime_L2_DPR(srcPath=None, scan=None, func_read=None):
     # scan = 'NS' / 'MS' / 'HS'
+
     Year    = func_read( srcPath, scan + '/ScanTime/Year'        ).astype('int')
     Month   = func_read( srcPath, scan + '/ScanTime/Month'       ).astype('int')
     Day     = func_read( srcPath, scan + '/ScanTime/DayOfMonth'  ).astype('int')

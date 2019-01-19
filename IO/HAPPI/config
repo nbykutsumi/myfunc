@@ -1,2 +1,3 @@
 [Defaults]
-baseDir            : /home/utsumi/mnt/wellshare/HAPPI/data
+#baseDir            : /home/utsumi/mnt/wellshare/HAPPI/data
+baseDir            : /media/disk2/share/HAPPI/data

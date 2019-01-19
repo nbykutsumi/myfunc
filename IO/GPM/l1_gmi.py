@@ -6,7 +6,7 @@ from    alien        import read_hdf5
 import  functions
 
 class L1_GMI(object):
-    def __init__(self, sensor='GPM.GMI', prdName='1B',version='V05',minorversion=''):
+    def __init__(self, sensor='GPM.GMI', prdName='1B',version='V05',minorversion='',agency='NASA'):
         self.sensor  = sensor
         self.prdName = prdName
         self.version = version
@@ -19,6 +19,8 @@ class L1_GMI(object):
         elif self.hostname=="mizu":
             self.rootDir  = "/home/utsumi/mnt/wellshare/data/GPM"
             #self.rootDir  = "/work/a01/utsumi/data/GPM"
+        elif self.hostname=="shui":
+            self.rootDir  = "/work/hk01/PMM/%s"%(agency)
 
         ## read_hdf function
         self.func_read  = read_hdf5.read_hdf5
@@ -36,6 +38,7 @@ class L1_GMI(object):
                                self.version,\
                                "%04d"%(Year),\
                                "%02d"%(Mon),\
+                               "%02d"%(Day)\
                               )
         
         lPath  = glob.glob(srcDir+"/%s*.%s.HDF5"%(self.prdName, self.fullversion))

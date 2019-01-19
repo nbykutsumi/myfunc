@@ -19,8 +19,8 @@ import  h5py
 def read_hdf5(srcPath, varName, Slice=None, verbose=True):
     h5      = h5py.File(srcPath, 'r')
 
+    #print h5[varName]
     if Slice == None:   Slice = slice(None,None,None)
-
     try:
         h5Var   = h5[varName]
         aOut    = h5Var[Slice]
@@ -30,10 +30,9 @@ def read_hdf5(srcPath, varName, Slice=None, verbose=True):
         print 'I/O Error'
         print 'Blank File? %s'%srcPath
         print 'Blank array will be returned [ %s ]'%varName
-        print h5Var.shape
-        print Slice
+        #print h5Var.shape
+        #print Slice
         print '!'*80
-
         raise ValueError
 
     if verbose  == True:
