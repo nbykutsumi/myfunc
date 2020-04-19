@@ -30,7 +30,7 @@ class GSMaP(object):
       else:
         self.baseDir  = "/media/disk2/data/GSMaP/%s.%s"%(prj, ver)
 
-    if hostname in ["mizu","naam"]:
+    if hostname in ["mizu","naam","shui"]:
       if prj == "realtime":
         self.baseDir          = "/data2/GSMaP/%s"%(prj)
         self.baseDirSateinfo  = "/data2/GSMaP/%s/sateinfo"%(prj)
@@ -89,6 +89,7 @@ class GSMaP(object):
     """
     srcPath = self.ret_path_sateinfo(DTime)
     if self.compressed==True:
+        ''' on the fly decompression'''
         f = gzip.open(srcPath, "rb")
         strdat = f.read()
         Data   = flipud(fromstring(strdat, dtype="int32").reshape(self.nyOrg, self.nxOrg))

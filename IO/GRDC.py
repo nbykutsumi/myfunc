@@ -9,6 +9,7 @@ class GRDC(object):
         self.miss_out = -9999.
         pass
 
+
     def mk_grdcDailyArray(self, srcPath, iDTimeOut, eDTimeOut, dattype='calc'):
     
         a1dat_grdc   = self.loadDailyDataArray(srcPath, dattype=dattype)

@@ -105,6 +105,14 @@ def array2csv(a):
     sout  = "\n".join(lline).strip()
   return sout
 
+def array2tab(a):
+  if len(a.shape)==1:
+    sout = "\n".join(map(str,a))
+  elif len(a.shape)==2:
+    lline = ["\t".join( map(str,line)) for line in a]
+    sout  = "\n".join(lline).strip()
+  return sout
+
 def list2csv(a):
   if type(a[0]) !=list:
     sout = "\n".join(map(str,a))
@@ -112,6 +120,15 @@ def list2csv(a):
     lline = [",".join( map(str,line)) for line in a]
     sout  = "\n".join(lline).strip()
   return sout
+
+def list2tab(a):
+  if type(a[0]) !=list:
+    sout = "\n".join(map(str,a))
+  elif type(a[0]) ==list:
+    lline = ["\t".join( map(str,line)) for line in a]
+    sout  = "\n".join(lline).strip()
+  return sout
+
 
 def join_list_cols(ll):
     lout = []
@@ -122,6 +139,8 @@ def join_list_cols(ll):
 
 def ret_lmon(season):
   if type(season)==int:
+    lmon  = [season]
+  elif type(season)==np.int64:
     lmon  = [season]
   elif season.isdigit():
     lmon  = [int(season)]
@@ -212,23 +231,23 @@ def nhourly2day2monthly(a3in, nh, calc="mean",miss_in=None, miss_out=None):
     per_day = int(24/nh)
     nstep, ny, nx = a3in.shape
     if nstep/per_day == 365:
-        Year = 1999  # just for calc
+        year = 1999  # just for calc
     elif nstep/per_day == 366:
-        Year = 2000  # just for calc
+        year = 2000  # just for calc
 
     if miss_in !=None:
         a3in = ma.masked_equal(a3in, miss_in)
 
     a3mon = np.empty([12,ny,nx], dtype=dtype)
-    for Mon in range(1,12+1):
-        iDay = 1
-        eDay = calendar.monthrange(Year,Mon)[1]
-        iDTime = datetime(Year,Mon,iDay,0)
-        eDTime = datetime(Year,Mon,eDay,0)
-        iDOY   = ret_day_of_year(iDTime)
-        eDOY   = ret_day_of_year(eDTime)
-        ik     = (iDOY-1)
-        ek     = (eDOY-1+1)
+    for mon in range(1,12+1):
+        iday = 1
+        eday = calendar.monthrange(year,mon)[1]
+        idtime = datetime(year,mon,iday,0)
+        edtime = datetime(year,mon,eday,0)
+        idoy   = ret_day_of_year(idtime)
+        edoy   = ret_day_of_year(edtime)
+        ik     = (idoy-1)
+        ek     = (edoy-1+1)
         a4tmp  = a3in.reshape(-1,per_day,ny,nx)
 
 
@@ -246,10 +265,6 @@ def nhourly2day2monthly(a3in, nh, calc="mean",miss_in=None, miss_out=None):
             if miss_out !=None:
                 a2mon = a2mon.filled(miss_out)
 
-        a3mon[Mon-1,:,:] = a2mon
+        a3mon[mon-1,:,:] = a2mon
     return a3mon
-
-
-
-
 
