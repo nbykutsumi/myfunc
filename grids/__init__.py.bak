@@ -23,7 +23,7 @@ def unfold2d( aSrc ):
 
     if len( shape ) > 2:
 
-        additionalaxes  = list(range( len(shape)-4))
+        additionalaxes  = range( len(shape)-4 )
 
         transAxis       = ( transAxis + len(additionalaxes) ).tolist()
         idx             = 0
@@ -55,7 +55,7 @@ def fold2d( aSrc, bndShp ):
 
     if len( shape ) > 2:
 
-        additionalaxes  = list(range( len(shape) - 2))
+        additionalaxes  = range( len(shape) - 2 )
 
         transAxis       = ( transAxis + len(additionalaxes) ).tolist()
         idx             = 0
@@ -99,7 +99,7 @@ def karnel_pooling_map2D_global(ain, dy, dx, func=None, miss_in=-9999, miss_out=
     elif func=='min':
         a2out = a3tmp.min(axis=0)
     else:
-        print('check func', func)
+        print 'check func', func
         sys.exit()
 
     a2out = a2out.filled(miss_out)[dy:-dy,dx:-dx]

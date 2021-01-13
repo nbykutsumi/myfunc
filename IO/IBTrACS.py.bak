@@ -54,8 +54,8 @@ class IBTrACS(object):
       lines   = f.readlines()[2:]
       f.close()
     else:
-      print('No file')
-      print(srcPath)
+      print 'No file'
+      print srcPath
       sys.exit()
     #--- init dict ---
     lDTime = ret_lDTime(iDTime,eDTime,timedelta(hours=dhours))
@@ -67,7 +67,7 @@ class IBTrACS(object):
     for line in lines:
       line     = line.split(",")
       isotime  = line[6].split(" ")
-      date     = list(map(int, isotime[0].split("-")))
+      date     = map(int, isotime[0].split("-"))
       Year     = date[0]
       Mon      = date[1]
       Day      = date[2]
@@ -101,7 +101,7 @@ class IBTrACS(object):
   def ret_dpyxy(self, iDTime, eDTime, a1lonbnd, a1latbnd, ver="v04r00"):
     ''' a1lonbnd, a1latbnd: boundaries of the grids, increasing order '''
     dlonlat = self.ret_dlonlat(iDTime,eDTime,ver)
-    lkey    = list(dlonlat.keys())
+    lkey    = dlonlat.keys()
     dout    = {}
     nx,ny   = len(a1lonbnd)-1, len(a1latbnd)-1
 
@@ -110,12 +110,12 @@ class IBTrACS(object):
       if len(llonlat)==0:
         dout[key] = []
       else:
-        aLon, aLat= list(zip(*llonlat))
+        aLon, aLat= zip(*llonlat)
         a1x = np.array([bisect_right(a1lonbnd, lon) for lon in aLon]) -1
         a1y = np.array([bisect_right(a1latbnd, lat) for lat in aLat]) -1
         a1x = ma.masked_outside(a1x, 0, nx-1).filled(-9999)
         a1y = ma.masked_outside(a1y, 0, ny-1).filled(-9999)
-        dout[key] = list(zip( a1x, a1y ))
+        dout[key] = zip( a1x, a1y )
 
     #---
     return dout
@@ -138,7 +138,7 @@ class IBTrACS_2D(IBTrACS):
     lpyxy        = self.dpyxy[DTime]
     a2dat        = self.a2zero.copy()
 
-    a1x, a1y = list(zip(*lpyxy))
+    a1x, a1y = zip(*lpyxy)
     a1flag = np.logical_and(a1x>=0, a1y>=0)
     a1x = np.array(a1x)[a1flag]
     a1y = np.array(a1y)[a1flag] 

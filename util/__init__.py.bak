@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from calendar import timegm
 from numpy    import ma, array, iterable, shape
-from math import sin, cos, acos
 import os, math
 import calendar
 import numpy as np
@@ -46,7 +45,7 @@ def ret_lDTime_noleap(iDTime,eDTime,dDTime):
           if itstp < 0: itstp=0
           if etstp > total_steps-1: etstp = total_steps-1
 
-          TstpLeap = TstpLeap + list(range(int(itstp), int(etstp)+1))
+          TstpLeap = TstpLeap + range(int(itstp), int(etstp)+1)
 
   ltstp = [i for i in range(total_steps) if i not in TstpLeap]
 
@@ -85,13 +84,13 @@ def ret_lYM(iYM, eYM):
   lYM = []
   for Year in range(iYear, eYear+1):
     if iYear == eYear:
-      lMon = list(range(iMon,eMon+1))
+      lMon = range(iMon,eMon+1)
     elif Year == iYear:
-      lMon = list(range(iMon,12+1))
+      lMon = range(iMon,12+1)
     elif Year == eYear:
-      lMon = list(range(1,eMon+1))
+      lMon = range(1,eMon+1)
     else:
-      lMon = list(range(1,12+1))   
+      lMon = range(1,12+1)   
 
     for Mon in lMon:
       lYM.append([Year,Mon])
@@ -147,7 +146,7 @@ def join_list_cols(ll):
     lout = []
     for l in ll:
         lout.append(list(l))
-    return list(map(list, list(zip(*lout))))
+    return map(list, zip(*lout))
          
 
 def ret_lmon(season):
@@ -188,7 +187,7 @@ def ret_lmon(season):
   elif season == "NoJJ":
     lmon  = [1,2,3,4,5,8,9,10,11,12]
   else:
-    print("check season",season, type(season))
+    print "check season",season, type(season)
   return lmon
 
 
@@ -225,7 +224,7 @@ def nhourly2monthly(a3in, nh, calc="mean",miss_in=None, miss_out=None):
         elif calc=="std":
             a2mon = a3in[ik:ek,:,:].std(axis=0)
         else:
-            print('check calc', calc)
+            print 'check calc', calc
 
         if ma.isMaskedArray(a2mon):
             if miss_out !=None:
@@ -272,7 +271,7 @@ def nhourly2day2monthly(a3in, nh, calc="mean",miss_in=None, miss_out=None):
         elif calc=="std":
             a2mon = a4tmp[ik:ek,:,:].mean(axis=1).std(axis=0)
         else:
-            print('check calc', calc)
+            print 'check calc', calc
 
         if ma.isMaskedArray(a2mon):
             if miss_out !=None:
@@ -280,25 +279,4 @@ def nhourly2day2monthly(a3in, nh, calc="mean",miss_in=None, miss_out=None):
 
         a3mon[mon-1,:,:] = a2mon
     return a3mon
-
-def calc_dist_gc(lat1, lat2, lon1, lon2):
-    """ Great circle distance
-        Latitudes and longitudes are in degrees.
-        Returns distance in [km]
-    """
-    RADEARTH = 6371.
-    DTR      = 0.017453
-    return RADEARTH*acos(cos(DTR*lon1-DTR*lon2)*cos(DTR*lat1)*cos(DTR*lat2) + sin(DTR*lat1)*sin(DTR*lat2))
-
-def calc_dist_gc_array(lat1, lat2, lon1, lon2):
-    """ Great circle distance
-        Latitudes and longitudes are in degrees.
-        Returns distance in [km]
-    """
-    RADEARTH = 6371.
-    DTR      = 0.017453
-    return RADEARTH*np.arccos(np.cos(DTR*lon1-DTR*lon2)*np.cos(DTR*lat1)*np.cos(DTR*lat2) + np.sin(DTR*lat1)*np.sin(DTR*lat2))
-
-
-
 
