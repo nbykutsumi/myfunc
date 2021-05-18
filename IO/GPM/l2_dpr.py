@@ -2,8 +2,8 @@ import  sys, os, importlib
 import  socket
 import  glob
 from    numpy        import *
-from    alien        import read_hdf5
-import  functions
+from    .alien        import read_hdf5
+from . import  functions
 
 class L2_DPR(object):
     def __init__(self, sensor='GPM.DPR', prdName='2A.DPR',version='05',minorversion='A',agency='NASA'):
@@ -46,7 +46,7 @@ class L2_DPR(object):
         elif agency=='NASA':
             lPath  = glob.glob(srcDir+"/*.%s.HDF5"%(self.fullversion))
         else:
-            print 'check agancy',agency
+            print('check agancy',agency)
             sys.exit()
         return lPath
 
@@ -71,11 +71,11 @@ if __name__ == '__main__':
 
     a = gpm.load_var_granule(srcPath=srcPath, Var=varName)
 
-    print a
-    print a.shape
+    print(a)
+    print(a.shape)
 
     #lgranule = gpm.list_granule(2014,10)
     #print lgranule
 
     adtime   = gpm.load_dtime_granule(srcPath=srcPath, scan='NS')
-    print adtime
+    print(adtime)

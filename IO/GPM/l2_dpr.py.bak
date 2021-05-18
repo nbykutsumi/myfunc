@@ -2,11 +2,11 @@ import  sys, os, importlib
 import  socket
 import  glob
 from    numpy        import *
-from    .alien        import read_hdf5
-from . import  functions
+from    alien        import read_hdf5
+import  functions
 
-class L1_GMI(object):
-    def __init__(self, sensor='GPM.GMI', prdName='1B',version='V05',minorversion='',agency='NASA'):
+class L2_DPR(object):
+    def __init__(self, sensor='GPM.DPR', prdName='2A.DPR',version='05',minorversion='A',agency='NASA'):
         self.sensor  = sensor
         self.prdName = prdName
         self.version = version
@@ -20,7 +20,7 @@ class L1_GMI(object):
             self.rootDir  = "/home/utsumi/mnt/wellshare/data/GPM"
             #self.rootDir  = "/work/a01/utsumi/data/GPM"
         elif self.hostname=="shui":
-            self.rootDir  = "/work/hk02/PMM/%s"%(agency)
+            self.rootDir  = "/work/hk01/PMM/%s"%(agency)
 
         ## read_hdf function
         self.func_read  = read_hdf5.read_hdf5
@@ -31,7 +31,7 @@ class L1_GMI(object):
         return  aOut
 
 
-    def list_granule(self, Year, Mon):
+    def list_granule(self, Year, Mon, Day):
         srcDir  = os.path.join(self.rootDir,\
                                self.sensor ,\
                                self.prdName,\
@@ -40,39 +40,42 @@ class L1_GMI(object):
                                "%02d"%(Mon),\
                                "%02d"%(Day)\
                               )
-        
-        lPath  = glob.glob(srcDir+"/%s*.%s.HDF5"%(self.prdName, self.fullversion))
+
+        if agency=='JAXA':        
+            lPath  = glob.glob(srcDir+"/*_%s.h5"%(self.fullversion))
+        elif agency=='NASA':
+            lPath  = glob.glob(srcDir+"/*.%s.HDF5"%(self.fullversion))
+        else:
+            print 'check agancy',agency
+            sys.exit()
         return lPath
 
     def load_dtime_granule(self, srcPath=None, scan=None):
-        ''' scan = "S1"/"S2"  '''
-        return functions.get_dtime_L1_GMI(srcPath, scan, self.load_var_granule)
+        ''' scan = "NS" / "MS" / "HS" '''
+        return functions.get_dtime_L2_DPR(srcPath, scan, self.load_var_granule)
 
 
 
 if __name__ == '__main__':
-    sensor = 'GPM.GMI'
-    prdName= '1B'
-    version= 'V05'
-    minorversion=''
-    gpm = L1_GMI(sensor, prdName, version, minorversion)
+    sensor = 'GPM.DPR'
+    prdName= '2A.DPR'
+    version= '05'
+    minorversion='A'
+    gpm = L2_DPR(sensor, prdName, version, minorversion)
 
-    srcDir = '/media/disk2/share/data/GPM/GPM.GMI/1B/V05/2017/12'
-    srcPath= srcDir + '/1B.GPM.GMI.TB2016.20171201-S000215-E013448.021350.V05A.HDF5'
+    srcDir = '/media/disk2/share/data/GPM/GPM.DPR/2A.DPR/05A/2017/12/01'
+    srcPath= srcDir + '/GPMCOR_DPR_1712010002_0134_021350_L2S_DD2_05A.h5'
 
-    #varName= 'GprofDHeadr/clusterProfiles'
-    #varName= 'S1/profileTemp2mIndex'
-    #varName= 'S1/profileNumber'
-    #varName= 'S1/profileScale'
-    varName= 'S1/ScanTime/Year'
+    #varName= 'NS/ScanTime/Year'
+    varName= 'NS/SLV/precipRate'
 
     a = gpm.load_var_granule(srcPath=srcPath, Var=varName)
 
-    print(a)
-    print((a.shape))
+    print a
+    print a.shape
 
     #lgranule = gpm.list_granule(2014,10)
     #print lgranule
 
-    adtime   = gpm.load_dtime_granule(srcPath=srcPath, scan='S1')
-    print(adtime)
+    adtime   = gpm.load_dtime_granule(srcPath=srcPath, scan='NS')
+    print adtime

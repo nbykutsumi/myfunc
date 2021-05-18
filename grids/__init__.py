@@ -3,6 +3,36 @@ from bisect import bisect, bisect_left, bisect_right
 import numpy as np
 import numpy.ma as ma
 import sys
+import math
+
+def mk_a2gridarea(a1latBnd, a1lonBnd):
+    """
+    a1latBnd, a1lonBnd in degrees, grid boundaries
+    returns in km^2
+    based on Oki and Kanae 1997, J. Japan Soc. Hydrol. & Water Resour.
+    """
+    a1lat0 = a1latBnd[:-1]
+    a1lat1 = a1latBnd[1:]
+    a1lon0 = a1lonBnd[:-1]
+    a1lon1 = a1lonBnd[1:]
+    
+    Lon0, Lat0 = np.meshgrid(a1lon0, a1lat0)
+    Lon1, Lat1 = np.meshgrid(a1lon1, a1lat1)
+    
+    pi = math.pi
+    R = 6378.136
+    e = 0.081819191
+    e2= 0.006694380
+    
+    def calc_f(Lat):
+        Lat = np.deg2rad(Lat)  # degree --> radian
+        return 0.5*np.sin(Lat)/(1-e2*(np.sin(Lat)**2)) + 1/(4*e)*np.log(np.abs((1+e*np.sin(Lat))/(1-e*np.sin(Lat))))  # np.log: natural logarithm
+    
+    f0 = calc_f(Lat0)
+    f1 = calc_f(Lat1)
+    
+    a2area = pi*R**2*(1-e2)/180 * (f1 - f0) * np.abs(Lon1-Lon0) # km2
+    return a2area
 
 def unfold2d( aSrc ):
     '''

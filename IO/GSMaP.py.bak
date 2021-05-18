@@ -77,8 +77,8 @@ class GSMaP(object):
 
     srcDir = os.path.join(self.baseDirSateinfo, "sateinfo","%04d"%(Year), "%02d"%(Mon), "%02d"%(Day))
     findPath=os.path.join(srcDir, "gsmap_%s.%04d%02d%02d.%02d00.%s.*.sateinfo.dat%s"%(self.prjabbr, Year,Mon,Day,Hour,ver, sfx))
-    print(srcDir)
-    print(findPath)
+    print srcDir
+    print findPath
     return glob(findPath)[0]
 
   def load_sateinfo(self, DTime):
@@ -156,7 +156,7 @@ class GSMaP(object):
     lDTime = ret_lDTime(iDTime, eDTime, dDTime)
     a2dat  = zeros([self.ny,self.nx],float32)
     for DTime in lDTime:
-      print(DTime)
+      print DTime
       a2dat = a2dat + ma.masked_less(self.load_mmh(DTime),0.0).filled(0.0)
 
     return a2dat / len(lDTime)
@@ -189,13 +189,14 @@ class GSMaP(object):
 
 
 class GSMaP_daily(object):
-  def __init__(self, prj="standard",ver="v6", prdName="daily", BBox=False, compressed=False, dbDir="/media/disk2/data/GSMaP"):
+  def __init__(self, prj="standard",ver="v6", prdName="daily", BBox=False, compressed=False):
     self.ver      = ver
     self.compressed=compressed
 
     #-- check host --
     hostname = socket.gethostname()
-    self.baseDir  = dbDir + "/%s/%s/%s/00Z-23Z"%(prj,ver,prdName)
+    if hostname == "well":
+        self.baseDir  = "/media/disk2/data/GSMaP/%s/%s/00Z-23Z"%(prj,ver,prdName)
 
     #if hostname in ["mizu","naam","shui"]:
     #  if prj == "realtime":
@@ -204,26 +205,14 @@ class GSMaP_daily(object):
     #  else:
     #    self.baseDir          = "/data2/GSMaP/%s/%s"%(prj,ver)
     #    self.baseDirSateinfo  = "/data2/GSMaP/%s/%s"%(prj,ver)
-
-    if (prj=="standard")&(ver=="v6")&(prdName=="daily"):
-        flabel = "rnl"
-    elif (prj=="standard")&(ver=="v6")&(prdName=="daily_G"):
-        flabel = "gauge_rnl"
-
-    self.flabel = flabel
     #----------------
     self.LatOrg  = arange(-59.95, 59.95+0.01, 0.1)
     self.LonOrg  = arange(0.05, 359.95+0.01, 0.1)
     self.nyOrg   = len(self.LatOrg)
     self.nxOrg   = len(self.LonOrg)
-    self.LatBndOrg = arange(-60,60+0.001,0.1)
-    self.LonBndOrg = arange(0,360+0.001,0.1)
-
     if BBox == False:
       self.Lat   = self.LatOrg
       self.Lon   = self.LonOrg
-      self.LatBnd= self.LatBndOrg
-      self.LonBnd= self.LonBndOrg
       self.ny    = self.nyOrg
       self.nx    = self.nxOrg
       self.BBox  = BBox
@@ -239,8 +228,6 @@ class GSMaP_daily(object):
       self.BBox = BBox
       self.Lat   = self.LatOrg[self.iY:self.eY]
       self.Lon   = self.LonOrg[self.iX:self.eX]
-      self.LatBnd= self.LatBndOrg[self.iY:self.eY+1]
-      self.LonBnd= self.LonBndOrg[self.iX:self.eX+1]
       self.ny    = len(self.Lat)
       self.nx    = len(self.Lon)
 
@@ -250,16 +237,7 @@ class GSMaP_daily(object):
     """
 
     Year,Mon,Day = DTime.timetuple()[:3]
-    flabel = self.flabel
-    srcDir = self.baseDir + "/%04d%02d"%(Year,Mon)
-    ssearch = srcDir + "/gsmap_%s.%04d%02d%02d.*.gz"%(flabel, Year, Mon, Day)
-    lsrcPath= glob(ssearch)
-    if len(lsrcPath)==0:
-        print("No file")
-        print(ssearch)
-        sys.exit()
-    else:
-        srcPath = lsrcPath[0]
+    srcPath = self.baseDir + "/%04d%02d"%(Year,Mon)
 
     if self.compressed==True:
         f = gzip.open(srcPath, "rb")

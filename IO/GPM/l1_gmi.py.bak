@@ -69,7 +69,7 @@ if __name__ == '__main__':
     a = gpm.load_var_granule(srcPath=srcPath, Var=varName)
 
     print(a)
-    print((a.shape))
+    print(a.shape)
 
     #lgranule = gpm.list_granule(2014,10)
     #print lgranule

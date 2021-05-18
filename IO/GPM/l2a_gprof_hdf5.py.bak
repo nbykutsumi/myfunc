@@ -2,11 +2,11 @@ import  sys, os, importlib
 import  socket
 import  glob
 from    numpy        import *
-from    .alien        import read_hdf5
-from . import  functions
+from    alien        import read_hdf5
+import  functions
 
-class L1_GMI(object):
-    def __init__(self, sensor='GPM.GMI', prdName='1B',version='V05',minorversion='',agency='NASA'):
+class L2A_GPROF_HDF5(object):
+    def __init__(self, sensor='TRMM.TMI', prdName='2A-CLIM',version='V05',minorversion='A'):
         self.sensor  = sensor
         self.prdName = prdName
         self.version = version
@@ -19,8 +19,6 @@ class L1_GMI(object):
         elif self.hostname=="mizu":
             self.rootDir  = "/home/utsumi/mnt/wellshare/data/GPM"
             #self.rootDir  = "/work/a01/utsumi/data/GPM"
-        elif self.hostname=="shui":
-            self.rootDir  = "/work/hk02/PMM/%s"%(agency)
 
         ## read_hdf function
         self.func_read  = read_hdf5.read_hdf5
@@ -38,27 +36,25 @@ class L1_GMI(object):
                                self.version,\
                                "%04d"%(Year),\
                                "%02d"%(Mon),\
-                               "%02d"%(Day)\
                               )
         
         lPath  = glob.glob(srcDir+"/%s*.%s.HDF5"%(self.prdName, self.fullversion))
         return lPath
 
-    def load_dtime_granule(self, srcPath=None, scan=None):
-        ''' scan = "S1"/"S2"  '''
-        return functions.get_dtime_L1_GMI(srcPath, scan, self.load_var_granule)
+    def load_dtime_granule(self, srcPath=None):
+        return functions.get_dtime_2AGPROF_hdf5(srcPath, self.load_var_granule)
 
 
 
 if __name__ == '__main__':
-    sensor = 'GPM.GMI'
-    prdName= '1B'
+    sensor = 'TRMM.TMI'
+    prdName= '2A-CLIM'
     version= 'V05'
-    minorversion=''
-    gpm = L1_GMI(sensor, prdName, version, minorversion)
+    minorversion='A'
+    gpm = L2A_GPROF_HDF5(sensor, prdName, version, minorversion)
 
-    srcDir = '/media/disk2/share/data/GPM/GPM.GMI/1B/V05/2017/12'
-    srcPath= srcDir + '/1B.GPM.GMI.TB2016.20171201-S000215-E013448.021350.V05A.HDF5'
+    srcDir = '/home/utsumi/mnt/wellshare/data/GPM/TRMM.TMI/2A-CLIM/V05/2014/10'
+    srcPath= srcDir + '/2A-CLIM.TRMM.TMI.GPROF2017v2.20141031-S033854-E051057.096593.V05A.HDF5'
 
     #varName= 'GprofDHeadr/clusterProfiles'
     #varName= 'S1/profileTemp2mIndex'
@@ -68,11 +64,11 @@ if __name__ == '__main__':
 
     a = gpm.load_var_granule(srcPath=srcPath, Var=varName)
 
-    print(a)
-    print((a.shape))
+    print a
+    print a.shape
 
     #lgranule = gpm.list_granule(2014,10)
     #print lgranule
 
-    adtime   = gpm.load_dtime_granule(srcPath=srcPath, scan='S1')
-    print(adtime)
+    adtime   = gpm.load_dtime_granule(srcPath=srcPath)
+    print adtime

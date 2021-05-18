@@ -18,16 +18,15 @@ def get_dtime_L2_DPR(srcPath=None, scan=None, func_read=None):
     MicSec  = func_read( srcPath, scan + '/ScanTime/MilliSecond' ).astype('int')*1000
 
     DTime   = []
-    #for y,m,d,H,M,S,uS in map(None,Year,Month,Day,Hour,Minute,Second,MicSec):
-    for y,m,d,H,M,S,uS in list(zip(Year,Month,Day,Hour,Minute,Second,MicSec)):
+    for y,m,d,H,M,S,uS in map(None,Year,Month,Day,Hour,Minute,Second,MicSec):
 
         if uS == 1000000:
             DTime.append( datetime(y,m,d,H,M,S,0)+timedelta(seconds=1) )
-            print(('Warning [Millisecond] == 1000 : %i %i %i %i %i %i %i'%(y,m,d,H,M,S,uS/1000)))
+            print('Warning [Millisecond] == 1000 : %i %i %i %i %i %i %i'%(y,m,d,H,M,S,uS/1000))
 
         elif S == 60:
             DTime.append( datetime(y,m,d,H,M,59,uS)+timedelta(seconds=1) )
-            print(('Warning [Second] == 60 : %i %i %i %i %i %i %i'%(y,m,d,H,M,S,uS/1000)))
+            print('Warning [Second] == 60 : %i %i %i %i %i %i %i'%(y,m,d,H,M,S,uS/1000))
 
         else:
             DTime.append( datetime(y,m,d,H,M,S,uS) )
@@ -48,11 +47,11 @@ def get_dtime_L2_EPC_hdf5(srcPath, func_read):
 
         if uS == 1000000:
             DTime.append( datetime(y,m,d,H,M,S,0)+timedelta(seconds=1) )
-            print(('Warning [Millisecond] == 1000 : %i %i %i %i %i %i %i'%(y,m,d,H,M,S,uS/1000)))
+            print('Warning [Millisecond] == 1000 : %i %i %i %i %i %i %i'%(y,m,d,H,M,S,uS/1000))
 
         elif S == 60:
             DTime.append( datetime(y,m,d,H,M,59,uS)+timedelta(seconds=1) )
-            print(('Warning [Second] == 60 : %i %i %i %i %i %i %i'%(y,m,d,H,M,S,uS/1000)))
+            print('Warning [Second] == 60 : %i %i %i %i %i %i %i'%(y,m,d,H,M,S,uS/1000))
 
         else:
             DTime.append( datetime(y,m,d,H,M,S,uS) )
@@ -77,11 +76,11 @@ def get_dtime_2AGPROF_hdf5(srcPath, func_read):
 
         if uS == 1000000:
             DTime.append( datetime(y,m,d,H,M,S,0)+timedelta(seconds=1) )
-            print(('Warning [Millisecond] == 1000 : %i %i %i %i %i %i %i'%(y,m,d,H,M,S,uS/1000)))
+            print('Warning [Millisecond] == 1000 : %i %i %i %i %i %i %i'%(y,m,d,H,M,S,uS/1000))
 
         elif S == 60:
             DTime.append( datetime(y,m,d,H,M,59,uS)+timedelta(seconds=1) )
-            print(('Warning [Second] == 60 : %i %i %i %i %i %i %i'%(y,m,d,H,M,S,uS/1000)))
+            print('Warning [Second] == 60 : %i %i %i %i %i %i %i'%(y,m,d,H,M,S,uS/1000))
 
         else:
             DTime.append( datetime(y,m,d,H,M,S,uS) )
@@ -104,11 +103,11 @@ def get_dtime_trmm(srcPath, func_read):
 
         if uS == 1000000:
             DTime.append( datetime(y,m,d,H,M,S,0)+timedelta(seconds=1) )
-            print(('Warning [Millisecond] == 1000 : %i %i %i %i %i %i %i'%(y,m,d,H,M,S,uS/1000)))
+            print('Warning [Millisecond] == 1000 : %i %i %i %i %i %i %i'%(y,m,d,H,M,S,uS/1000))
 
         elif S == 60:
             DTime.append( datetime(y,m,d,H,M,59,uS)+timedelta(seconds=1) )
-            print(('Warning [Second] == 60 : %i %i %i %i %i %i %i'%(y,m,d,H,M,S,uS/1000)))
+            print('Warning [Second] == 60 : %i %i %i %i %i %i %i'%(y,m,d,H,M,S,uS/1000))
 
         else:
             DTime.append( datetime(y,m,d,H,M,S,uS) )

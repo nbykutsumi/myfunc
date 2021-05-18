@@ -30,13 +30,17 @@ class IBTrACS(object):
     self.Versions= ["v04r00"]
 
 
-  def ret_path(self, ver="v04r00"):
+  def ret_path(self, ver="v04r00", prd="ALL"):
+    """
+    prd: "ALL","since1980","WP"
+    """
     srcDir  = os.path.join(self.baseDir, ver)
     #self.srcPath = self.srcDir + "/Year.%04d.ibtracs_all.%s.csv"%(Year,ver)
-    return srcDir + "/ibtracs.since1980.list.%s.csv"%(ver)
+    #return srcDir + "/ibtracs.since1980.list.%s.csv"%(ver)
+    return srcDir + "/ibtracs.%s.list.%s.csv"%(prd, ver)
 
 
-  def ret_dlonlat(self,iDTime,eDTime, ver="v04r00",dhours=6,natures=['TS'],lvaridx=[]):
+  def ret_dlonlat(self,iDTime,eDTime, ver="v04r00",dhours=6,natures=['TS'],tracktypes=["PROVISIONAL","main"],lvaridx=[]):
     '''
     DS - Disturbance
     TS - Tropical
@@ -82,6 +86,11 @@ class IBTrACS(object):
       #--- check nature --
       nature   = line[7].strip()
       if nature not in natures:
+        continue
+
+      ##--- check track_type --
+      tracktype = line[13].strip()
+      if tracktype not in tracktypes:
         continue
 
       #-----------------

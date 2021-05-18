@@ -2,8 +2,8 @@ import  sys, os, importlib
 import  socket
 import  glob
 from    numpy        import *
-from    alien        import read_hdf5
-import  functions
+from    .alien        import read_hdf5
+from . import  functions
 
 class L2A_GPROF_HDF5(object):
     def __init__(self, sensor='TRMM.TMI', prdName='2A-CLIM',version='V05',minorversion='A'):
@@ -64,11 +64,11 @@ if __name__ == '__main__':
 
     a = gpm.load_var_granule(srcPath=srcPath, Var=varName)
 
-    print a
-    print a.shape
+    print(a)
+    print(a.shape)
 
     #lgranule = gpm.list_granule(2014,10)
     #print lgranule
 
     adtime   = gpm.load_dtime_granule(srcPath=srcPath)
-    print adtime
+    print(adtime)
